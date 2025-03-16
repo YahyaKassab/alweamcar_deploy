@@ -6,9 +6,9 @@ const Feedback = require("./models/Feedback");
 const News = require("./models/News");
 const Make = require("./models/Make");
 
-const uploadsDirCars = path.join(__dirname, "../../uploads/cars");
-const uploadsDirOffers = path.join(__dirname, "../../uploads/offers");
-const uploadsDirNews = path.join(__dirname, "../../uploads/news");
+const uploadsDirCars = path.join(__dirname, "../public/uploads/images/cars");
+const uploadsDirOffers = path.join(__dirname, "../public/uploads/images/offers");
+const uploadsDirNews = path.join(__dirname, "../public/uploads/images/news");
 
 const imagesSourceDirCars = path.join(__dirname, "data/images/cars");
 const imagesSourceDirOffers = path.join(__dirname, "data/images/offers");
@@ -16,6 +16,8 @@ const imagesSourceDirOffers = path.join(__dirname, "data/images/offers");
 const seedData = async () => {
   try {
     console.log("🧹 Clearing old data...");
+    console.log("uploads dir:", uploadsDirCars);
+    console.log("source dir:", imagesSourceDirCars);
 
     // Delete all car images
     if (fs.existsSync(uploadsDirCars)) {
@@ -66,7 +68,7 @@ const seedData = async () => {
                 if (fs.existsSync(sourcePath)) {
                     fs.copyFileSync(sourcePath, destinationPath);
                     console.log(`📸 Copied car image: ${image}`);
-                    return `/uploads/cars/${image}`;
+                    return `/uploads/images/cars/${image}`;
                 } else {
                     console.warn(`⚠️ Car image not found: ${image}`);
                     return null; // Keep track of missing images
@@ -98,7 +100,7 @@ const seedData = async () => {
         console.warn(`⚠️ news image not found: ${news.image}`);
       }
 
-      news.image = `/uploads/cars/${news.image}`;
+      news.image = `/uploads/images/cars/${news.image}`;
     });
 
     // Copy offer images and update paths
@@ -113,7 +115,7 @@ const seedData = async () => {
         console.warn(`⚠️ Offer image not found: ${offer.image}`);
       }
 
-      offer.image = `/uploads/offers/${offer.image}`;
+      offer.image = `/uploads/images/offers/${offer.image}`;
     });
 
     // Insert data into the database

@@ -33,9 +33,9 @@ services:
     networks:
       - alweam-network
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=5000
-      - MONGODB_URI=mongodb://admin:password@mongodb:27017/car-website?authSource=admin&directConnection=true&serverSelectionTimeoutMS=60000
+      - MONGODB_URI=mongodb://admin:password@mongodb/car-website?authSource=admin&directConnection=true&serverSelectionTimeoutMS=60000
       - JWT_SECRET=your_jwt_secret_key
       - EMAIL_PASSWORD=lgpo gbls xgem vqzv
       - EMAIL_USERNAME=ya7yakassab@gmail.com

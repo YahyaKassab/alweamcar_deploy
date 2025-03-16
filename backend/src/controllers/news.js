@@ -56,7 +56,7 @@ exports.getNews = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.createNews = asyncHandler(async (req, res, next) => {
     if (req.file) {
-        req.body.image = `/uploads/news/${req.file.filename}`;
+        req.body.image = `/uploads/images/news/${req.file.filename}`;
     }
     const { title_en, title_ar, details_en, details_ar } = req.body;
     const newsData = {
@@ -89,7 +89,7 @@ exports.updateNews = asyncHandler(async (req, res, next) => {
         if (fs.existsSync(oldImagePath)) {
             fs.promises.unlink(oldImagePath);
         }
-        req.body.image = `/uploads/news/${req.file.filename}`;
+        req.body.image = `/uploads/images/news/${req.file.filename}`;
     }
     news = await News.findByIdAndUpdate(req.params.id, req.body, {
         new: true,

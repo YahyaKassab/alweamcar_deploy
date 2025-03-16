@@ -4,9 +4,9 @@ const fs = require('fs');
 const ErrorResponse = require('../utils/errorResponse');
 
 // Create uploads directory if it doesn't exist
-const uploadsDirCars = path.join(__dirname, '../../uploads/cars');
-const uploadsDirOffers = path.join(__dirname, '../../uploads/offers');
-const uploadsDirNews = path.join(__dirname, '../../uploads/news');
+const uploadsDirCars = path.join(__dirname, '../../public/uploads/images/cars');
+const uploadsDirOffers = path.join(__dirname, '../../public/uploads/images/offers');
+const uploadsDirNews = path.join(__dirname, '../../public/uploads/images/news');
 
 if (!fs.existsSync(uploadsDirCars)) {
     fs.mkdirSync(uploadsDirCars, { recursive: true });

@@ -56,7 +56,7 @@ exports.getSeasonalOffer = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.createSeasonalOffer = asyncHandler(async (req, res, next) => {
     if (req.file) {
-        req.body.image = `/uploads/offers/${req.file.filename}`;
+        req.body.image = `/uploads/images/offers/${req.file.filename}`;
     }
 
     const offer = await SeasonalOffer.create(req.body);
@@ -93,7 +93,7 @@ exports.updateSeasonalOffer = asyncHandler(async (req, res, next) => {
             fs.promises.unlink(oldImagePath);
         }
 
-        req.body.image = `/uploads/offers/${req.file.filename}`;
+        req.body.image = `/uploads/images/offers/${req.file.filename}`;
     }
 
     offer = await SeasonalOffer.findByIdAndUpdate(req.params.id, req.body, {

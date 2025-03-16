@@ -9,8 +9,8 @@ const path  = require("path");
 const Make = require("../models/Make");
 
 dotenv.config();
-const uploadsDirCars = path.join(__dirname, "../../../uploads/cars");
-const uploadsDirOffers = path.join(__dirname, "../../../uploads/offers");
+const uploadsDirCars = path.join(__dirname, "../../public/uploads/images/cars");
+const uploadsDirOffers = path.join(__dirname, "../../public/uploads/images/offers");
 const wipeDatabase = async () => {
   try {
     connectDB()

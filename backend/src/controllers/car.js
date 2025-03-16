@@ -106,7 +106,7 @@ exports.createCar = asyncHandler(async (req, res, next) => {
   }
 
   if (req.files && req.files.length > 0) {
-    carData.images = req.files.map(file => `/uploads/${file.filename}`);
+    carData.images = req.files.map(file => `/uploads/images/cars/${file.filename}`);
   }
 
   const car = await Car.create(carData);
@@ -147,11 +147,11 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
   }
 
   if (req.files && req.files.length > 0) {
-    const newImagePaths = req.files.map(file => `/uploads/${file.filename}`);
+    const newImagePaths = req.files.map(file => `/uploads/images/cars/${file.filename}`);
 
     if (req.body.replaceImages === 'true') {
       car.images.forEach(image => {
-        const imagePath = path.join(__dirname, '/uploads', image);
+        const imagePath = path.join(__dirname, '/uploads/images/cars', image);
         if (fs.existsSync(imagePath)) {
           fs.unlinkSync(imagePath);
         }
@@ -177,7 +177,7 @@ exports.deleteCar = asyncHandler(async (req, res, next) => {
   }
 
   car.images.forEach(image => {
-    const imagePath = path.join(__dirname, '/uploads', image);
+    const imagePath = path.join(__dirname, '/uploads/images/cars', image);
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     }
