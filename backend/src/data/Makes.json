@@ -1,0 +1,63 @@
+[
+    {
+      "name": "Toyota",
+      "models": ["Camry", "Corolla", "RAV4", "Highlander", "Tacoma"]
+    },
+    {
+      "name": "Honda",
+      "models": ["Civic", "Accord", "CR-V", "Pilot", "Fit"]
+    },
+    {
+      "name": "Ford",
+      "models": ["F-150", "Mustang", "Explorer", "Escape", "Bronco"]
+    },
+    {
+      "name": "Chevrolet",
+      "models": ["Silverado", "Malibu", "Equinox", "Tahoe", "Camaro"]
+    },
+    {
+      "name": "BMW",
+      "models": ["3 Series", "5 Series", "X5", "X3", "M4"]
+    },
+    {
+      "name": "Mercedes-Benz",
+      "models": ["C-Class", "E-Class", "S-Class", "GLC", "GLE"]
+    },
+    {
+      "name": "Audi",
+      "models": ["A4", "A6", "Q5", "Q7", "RS5"]
+    },
+    {
+      "name": "Nissan",
+      "models": ["Altima", "Sentra", "Rogue", "Murano", "GT-R"]
+    },
+    {
+      "name": "Hyundai",
+      "models": ["Elantra", "Sonata", "Tucson", "Santa Fe", "Kona"]
+    },
+    {
+      "name": "Tesla",
+      "models": ["Model S", "Model 3", "Model X", "Model Y", "Cybertruck"]
+    },
+    {
+      "name": "Volkswagen",
+      "models": ["Golf", "Jetta", "Passat", "Tiguan", "Atlas"]
+    },
+    {
+      "name": "Subaru",
+      "models": ["Outback", "Forester", "Crosstrek", "Impreza", "WRX"]
+    },
+    {
+      "name": "Lexus",
+      "models": ["RX", "ES", "NX", "IS", "GX"]
+    },
+    {
+      "name": "Mazda",
+      "models": ["Mazda3", "Mazda6", "CX-5", "CX-30", "MX-5 Miata"]
+    },
+    {
+      "name": "Jeep",
+      "models": ["Wrangler", "Grand Cherokee", "Cherokee", "Renegade", "Gladiator"]
+    }
+  ]
+  

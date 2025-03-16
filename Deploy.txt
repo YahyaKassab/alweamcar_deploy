@@ -1,0 +1,107 @@
+install node latest
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install 22.14.0
+nvm use 22.14.0
+npm install esbuild --no-optional
+pkill -f node
+start docker daemon:
+sudo service docker start
+
+I already got .env, dockerfile in the github, and I got the text of nginx config, I will copy it
+
+
+Docker-compose:
+cat > docker-compose.yml << 'EOF'
+version: '3'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - alweam-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=car-website
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    networks:
+      - alweam-network
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/car-website?authSource=admin&directConnection=true&serverSelectionTimeoutMS=60000
+      - JWT_SECRET=your_jwt_secret_key
+      - EMAIL_PASSWORD=lgpo gbls xgem vqzv
+      - EMAIL_USERNAME=ya7yakassab@gmail.com
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - alweam-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./uploads:/usr/share/nginx/uploads
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - alweam-network
+
+networks:
+  alweam-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+EOF
+
+=====
+
+
+Steps
+Install docker 
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+sudo dockerd --host=unix:///var/run/docker.sock &
+2,3, Dockerfiles from nginx, docker-compose
+
+git clone --branch Production_docker --single-branch https://github.com/YahyaKassab/alweamcar.git backend
+git clone --branch Production_docker --single-branch https://github.com/YahyaKassab/alweam_react.git frontend
+

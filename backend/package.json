@@ -1,0 +1,43 @@
+{
+    "name": "alweamcar",
+    "version": "1.0.0",
+    "main": "index.js",
+"scripts": {
+   "start": "set NODE_ENV=production && node src/server.js",
+   "build": "set NODE_ENV=production && node src/server.js",
+   "dev": "set NODE_ENV=development && set PORT=3000 && nodemon src/server.js",
+   "seed-data": "set NODE_ENV=production && node src/scripts/seedData.js",
+   "seed-admin": "set NODE_ENV=production && node src/scripts/seedAdmin.js",
+   "wipe": "set NODE_ENV=production && node src/scripts/wipe.js",
+   "seed-data-dev": "set NODE_ENV=development && set PORT=3000 && node src/scripts/seedData.js",
+   "seed-admin-dev": "set NODE_ENV=development && set PORT=3000 && node src/scripts/seedAdmin.js",
+   "wipe-dev": "set NODE_ENV=development && set PORT=3000 && node src/scripts/wipe.js",
+   "test": "echo \"Error: no test specified\" && exit 1"
+ }
+
+,
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "express-rate-limit": "^7.5.0",
+        "helmet": "^8.0.0",
+        "joi": "^17.13.3",
+        "jsonwebtoken": "^9.0.2",
+        "marked": "^15.0.7",
+        "mongoose": "^8.12.1",
+        "multer": "^1.4.5-lts.1",
+        "nodemailer": "^6.10.0",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1"
+    },
+    "devDependencies": {
+        "morgan": "^1.10.0",
+        "nodemon": "^3.1.9"
+    }
+}

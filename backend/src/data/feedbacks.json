@@ -1,0 +1,64 @@
+
+[
+    {
+      "fullName": "Ahmed Khaled",
+      "mobileNumber": "+201234567890",
+      "email": "ahmed.khaled@example.com",
+      "message": "Great experience! The service was excellent, and the car was in perfect condition."
+    },
+    {
+      "fullName": "Sara Mostafa",
+      "mobileNumber": "+201098765432",
+      "email": "sara.mostafa@example.com",
+      "message": "I'm very happy with my purchase. The team was very professional and helpful!"
+    },
+    {
+      "fullName": "Mohamed Ezzat",
+      "mobileNumber": "+201556789012",
+      "email": "mohamed.ezzat@example.com",
+      "message": "Smooth process from start to finish. Highly recommended!"
+    },
+    {
+      "fullName": "Laila Hussein",
+      "mobileNumber": "+201698745236",
+      "email": "laila.hussein@example.com",
+      "message": "The customer support was very responsive and answered all my questions."
+    },
+    {
+      "fullName": "Omar Youssef",
+      "mobileNumber": "+201788899900",
+      "email": "omar.youssef@example.com",
+      "message": "Good selection of cars, but the prices are a bit high compared to competitors."
+    },
+    {
+      "fullName": "Nour Hany",
+      "mobileNumber": "+201233445566",
+      "email": "nour.hany@example.com",
+      "message": "Had a small issue with paperwork, but it was resolved quickly. Thank you!"
+    },
+    {
+      "fullName": "Hassan Gamal",
+      "mobileNumber": "+201677788899",
+      "email": "hassan.gamal@example.com",
+      "message": "Amazing staff and great deals. Will definitely buy from here again."
+    },
+    {
+      "fullName": "Mariam Adel",
+      "mobileNumber": "+201822233344",
+      "email": "mariam.adel@example.com",
+      "message": "Love my new car! The team was very helpful throughout the process."
+    },
+    {
+      "fullName": "Khaled Rami",
+      "mobileNumber": "+201966677788",
+      "email": "khaled.rami@example.com",
+      "message": "The process was a bit slow, but the car was exactly as described."
+    },
+    {
+      "fullName": "Dina Sameh",
+      "mobileNumber": "+201344556677",
+      "email": "dina.sameh@example.com",
+      "message": "Best car dealership I’ve dealt with. Highly recommended!"
+    }
+  ]
+  

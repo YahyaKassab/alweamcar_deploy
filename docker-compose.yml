@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - alweam-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=car-website
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./uploads:/usr/src/app/public/uploads/images
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    networks:
+      - alweam-network
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/car-website?authSource=admin&directConnection=true&serverSelectionTimeoutMS=60000
+      - JWT_SECRET=your_jwt_secret_key
+      - EMAIL_PASSWORD=lgpo gbls xgem vqzv
+      - EMAIL_USERNAME=ya7yakassab@gmail.com
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - "80:80" # Maps host port 80 to container port 80 (Nginx inside)
+    depends_on:
+      - backend
+    networks:
+      - alweam-network
+
+networks:
+  alweam-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
