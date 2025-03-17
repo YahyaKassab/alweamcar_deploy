@@ -1,10 +1,16 @@
 const News = require('../models/News');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/asyncHandler');
-const path = require('path');
-const fs = require('fs');
-const messages = require('../locales/messages'); // Import localization messages
+const messages = require('../locales/messages');
 const { default: mongoose } = require('mongoose');
+const cloudinary = require('cloudinary').v2;
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // @desc    Get all news with pagination
 // @route   GET /api/news
@@ -56,20 +62,24 @@ exports.getNews = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.createNews = asyncHandler(async (req, res, next) => {
     if (req.file) {
-        req.body.image = `/uploads/images/news/${req.file.filename}`;
+        // Cloudinary now handles the file, and multer-storage-cloudinary adds the URL to req.file
+        req.body.image = req.file.path;
     }
+    
     const { title_en, title_ar, details_en, details_ar } = req.body;
     const newsData = {
         title: { en: title_en, ar: title_ar },
         details: { en: details_en, ar: details_ar },
-        image: req.body.image ? req.body.image : null, // Ensure image handling
+        image: req.body.image ? req.body.image : null, // Use Cloudinary URL
     };
+    
     let news;
     if (title_en) {
         news = await News.create(newsData);
     } else {
         news = await News.create(req.body);
     }
+    
     res.status(201).json({ success: true, data: news });
 });
 
@@ -84,17 +94,29 @@ exports.updateNews = asyncHandler(async (req, res, next) => {
         en = en.replace('{id}', req.params.id);
         return next(new ErrorResponse({ en, ar }, 404));
     }
+    
     if (req.file) {
-        const oldImagePath = path.join(__dirname, '../../public', news.image);
-        if (fs.existsSync(oldImagePath)) {
-            fs.promises.unlink(oldImagePath);
+        // If there's an existing image, delete it from Cloudinary
+        if (news.image) {
+            try {
+                // Extract public_id from the Cloudinary URL
+                const publicId = news.image.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(`Alweam/news/${publicId}`);
+                console.log(`Deleted old image from Cloudinary: ${publicId}`);
+            } catch (error) {
+                console.error('Failed to delete image from Cloudinary:', error);
+            }
         }
-        req.body.image = `/uploads/images/news/${req.file.filename}`;
+        
+        // Update with new Cloudinary URL
+        req.body.image = req.file.path;
     }
+    
     news = await News.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
     });
+    
     res.status(200).json({ success: true, data: news });
 });
 
@@ -109,10 +131,19 @@ exports.deleteNews = asyncHandler(async (req, res, next) => {
         en = en.replace('{id}', req.params.id);
         return next(new ErrorResponse({ en, ar }, 404));
     }
-    const imagePath = path.join(__dirname, '../../public', news.image);
-    if (fs.existsSync(imagePath)) {
-        fs.promises.unlink(imagePath);
+    
+    // Delete the image from Cloudinary if it exists
+    if (news.image) {
+        try {
+            // Extract public_id from the Cloudinary URL
+            const publicId = news.image.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(`Alweam/news/${publicId}`);
+            console.log(`Deleted image from Cloudinary: ${publicId}`);
+        } catch (error) {
+            console.error('Failed to delete image from Cloudinary:', error);
+        }
     }
+    
     await news.deleteOne();
     res.status(200).json({ success: true, message: messages.newsDeleted });
 });

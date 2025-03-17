@@ -1,0 +1,289 @@
+[{
+    "make": "BMW",
+    "model": "X5",
+    "year": 2022,
+    "condition": "Elite Approved",
+    "mileage": 18000,
+    "stockNumber": "BMW654321",
+    "exteriorColor": "Blue",
+    "interiorColor": "Brown",
+    "engine": "3.0L Turbocharged 6-Cylinder",
+    "bhp": 335,
+    "door": 5,
+    "warranty": true,
+    "name": "BMW X5 2022",
+    "price": 60000,
+    "images": ["1.jpg", "3.jpg", "2.jpg", "1.jpg"]
+  },
+  {
+    "make": "Audi",
+    "model": "A6",
+    "year": 2021,
+    "condition": "Elite Approved",
+    "mileage": 25000,
+    "stockNumber": "AUD159753",
+    "exteriorColor": "Gray",
+    "interiorColor": "Black",
+    "engine": "2.0L Turbocharged 4-Cylinder",
+    "bhp": 261,
+    "door": 4,
+    "warranty": false,
+    "name": "Audi A6 2021",
+    "price": 43000,
+    "images": ["2.jpg", "1.jpg", "3.jpg", "2.jpg", "1.jpg"]
+  },
+  {
+    "make": "Ford",
+    "model": "F-150",
+    "year": 2023,
+    "condition": "Brand New",
+    "mileage": 0,
+    "stockNumber": "FRD753951",
+    "exteriorColor": "Red",
+    "interiorColor": "Black",
+    "engine": "3.5L V6",
+    "bhp": 400,
+    "door": 4,
+    "warranty": true,
+    "name": "Ford F-150 2023",
+    "price": 55000,
+    "images": ["3.jpg", "2.jpg", "1.jpg"]
+  },
+  {
+    "make": "Tesla",
+    "model": "Model 3",
+    "year": 2023,
+    "condition": "Brand New",
+    "mileage": 0,
+    "stockNumber": "TSL852963",
+    "exteriorColor": "White",
+    "interiorColor": "Black",
+    "engine": "Electric",
+    "bhp": 283,
+    "door": 4,
+    "warranty": true,
+    "name": "Tesla Model 3 2023",
+    "price": 42000,
+    "images": ["3.jpg", "2.jpg", "1.jpg"]
+  },
+  {
+    "make": "Chevrolet",
+    "model": "Tahoe",
+    "year": 2022,
+    "condition": "Elite Approved",
+    "mileage": 15000,
+    "stockNumber": "CHV159357",
+    "exteriorColor": "Black",
+    "interiorColor": "Gray",
+    "engine": "5.3L V8",
+    "bhp": 355,
+    "door": 4,
+    "warranty": true,
+    "name": "Chevrolet Tahoe 2022",
+    "price": 58000,
+    "images": ["1.jpg", "3.jpg", "2.jpg", "1.jpg"]
+  },
+  {
+    "make": "Nissan",
+    "model": "Altima",
+    "year": 2021,
+    "condition": "Elite Approved",
+    "mileage": 30000,
+    "stockNumber": "NSN753159",
+    "exteriorColor": "Silver",
+    "interiorColor": "Black",
+    "engine": "2.5L 4-Cylinder",
+    "bhp": 188,
+    "door": 4,
+    "warranty": false,
+    "name": "Nissan Altima 2021",
+    "price": 21000,
+    "images": ["2.jpg", "1.jpg", "3.jpg"]
+  },
+  {
+    "make": "Lexus",
+    "model": "RX 350",
+    "year": 2023,
+    "condition": "Brand New",
+    "mileage": 0,
+    "stockNumber": "LXS987321",
+    "exteriorColor": "Gray",
+    "interiorColor": "Beige",
+    "engine": "3.5L V6",
+    "bhp": 295,
+    "door": 4,
+    "warranty": true,
+    "name": "Lexus RX 350 2023",
+    "price": 50000,
+    "images": ["2.jpg", "1.jpg", "3.jpg"]
+  }
+  ,
+  {
+    "title": {
+      "en": "Car Prices Expected to Drop Soon",
+      "ar": "من المتوقع انخفاض أسعار السيارات قريبًا"
+    },
+    "details": {
+      "en": "Experts predict a decline in car prices as production levels normalize.",
+      "ar": "يتوقع الخبراء انخفاض أسعار السيارات مع عودة مستويات الإنتاج إلى طبيعتها."
+    },
+    "date": "2024-03-15T14:20:00Z",
+    "image": "4.jpg"
+  },
+  {
+    "title": {
+      "en": "Hybrid Cars Gain Popularity",
+      "ar": "السيارات الهجينة تزداد شهرة"
+    },
+    "details": {
+      "en": "More consumers are opting for hybrid vehicles due to fuel efficiency and environmental concerns.",
+      "ar": "يتجه المزيد من المستهلكين إلى السيارات الهجينة بسبب كفاءتها في استهلاك الوقود والمخاوف البيئية."
+    },
+    "date": "2024-03-18T11:00:00Z",
+    "image": "6.jpg"
+  },
+  {
+    "title": {
+      "en": "Luxury Car Brand Opens New Showroom",
+      "ar": "علامة سيارات فاخرة تفتتح صالة عرض جديدة"
+    },
+    "details": {
+      "en": "A well-known luxury car brand has inaugurated a new showroom in the heart of the city.",
+      "ar": "افتتحت علامة تجارية معروفة للسيارات الفاخرة صالة عرض جديدة في وسط المدينة."
+    },
+    "date": "2024-03-20T16:30:00Z",
+    "image": "5.jpg"
+  },
+  {
+    "title": {
+      "en": "Fuel Prices Surge Again",
+      "ar": "ارتفاع جديد في أسعار الوقود"
+    },
+    "details": {
+      "en": "Fuel prices have increased due to fluctuations in the global oil market.",
+      "ar": "ارتفعت أسعار الوقود بسبب التقلبات في سوق النفط العالمي."
+    },
+    "date": "2024-03-22T10:15:00Z",
+    "image": "7.jpg"
+  },
+  {
+    "title": {
+      "en": "Self-Driving Cars Tested in Major Cities",
+      "ar": "اختبار السيارات ذاتية القيادة في المدن الكبرى"
+    },
+    "details": {
+      "en": "Tech companies have started testing autonomous vehicles on urban roads.",
+      "ar": "بدأت شركات التكنولوجيا في اختبار المركبات ذاتية القيادة على الطرق الحضرية."
+    },
+    "date": "2024-03-25T13:00:00Z",
+    "image": "8.jpg"
+  },
+  {
+    "title": {
+      "en": "Upcoming Auto Show Features Latest Innovations",
+      "ar": "معرض السيارات القادم يعرض أحدث الابتكارات"
+    },
+    "details": {
+      "en": "The upcoming international auto show will showcase the newest advancements in car technology.",
+      "ar": "سيعرض معرض السيارات الدولي القادم أحدث التطورات في تكنولوجيا السيارات."
+    },
+    "date": "2024-03-28T09:00:00Z",
+    "image": "9.jpg"
+  },
+  {
+    "title": {
+      "en": "Government Announces EV Incentives",
+      "ar": "الحكومة تعلن عن حوافز للسيارات الكهربائية"
+    },
+    "details": {
+      "en": "New incentives have been introduced to encourage electric vehicle adoption.",
+      "ar": "تم الإعلان عن حوافز جديدة لتشجيع اعتماد السيارات الكهربائية."
+    },
+    "date": "2024-04-01T15:45:00Z",
+    "image": "10.jpg"
+  },
+  {
+    "image": "3.jpg",
+    "title": {
+      "en": "Ramadan Exclusive Deals",
+      "ar": "عروض رمضان الحصرية"
+    },
+    "details": {
+      "en": "Special discounts on household and food items.",
+      "ar": "خصومات خاصة على الأدوات المنزلية والمواد الغذائية."
+    },
+    "show": true
+  },
+  {
+    "image": "2.jpg",
+    "title": {
+      "en": "Back to School Offer",
+      "ar": "عرض العودة إلى المدرسة"
+    },
+    "details": {
+      "en": "Save on school supplies and backpacks.",
+      "ar": "وفر في اللوازم المدرسية والحقائب."
+    },
+    "show": true
+  },
+  {
+    "image": "3.jpg",
+    "title": {
+      "en": "Eid Festive Sale",
+      "ar": "تخفيضات العيد الاحتفالية"
+    },
+    "details": {
+      "en": "Special offers on traditional Eid clothing.",
+      "ar": "عروض خاصة على الملابس التقليدية للعيد."
+    },
+    "show": true
+  },
+  {
+    "image": "1.jpg",
+    "title": {
+      "en": "Black Friday Mega Sale",
+      "ar": "تخفيضات الجمعة السوداء الكبرى"
+    },
+    "details": {
+      "en": "Unbelievable discounts on all categories.",
+      "ar": "خصومات لا تصدق على جميع الفئات."
+    },
+    "show": true
+  },
+  {
+    "image": "2.jpg",
+    "title": {
+      "en": "Spring Fashion Launch",
+      "ar": "إطلاق موضة الربيع"
+    },
+    "details": {
+      "en": "Discover the latest trends in spring wear.",
+      "ar": "اكتشف أحدث اتجاهات الملابس الربيعية."
+    },
+    "show": true
+  },
+  {
+    "image": "1.jpg",
+    "title": {
+      "en": "Mother's Day Special",
+      "ar": "عرض خاص لعيد الأم"
+    },
+    "details": {
+      "en": "Buy one, get one free on selected gifts.",
+      "ar": "اشترِ واحدة واحصل على أخرى مجانًا على الهدايا المختارة."
+    },
+    "show": true
+  },
+  {
+    "image": "3.jpg",
+    "title": {
+      "en": "Exclusive Tech Deals",
+      "ar": "عروض تقنية حصرية"
+    },
+    "details": {
+      "en": "Massive discounts on smartphones and gadgets.",
+      "ar": "خصومات ضخمة على الهواتف الذكية والأجهزة."
+    },
+    "show": true
+  }
+]

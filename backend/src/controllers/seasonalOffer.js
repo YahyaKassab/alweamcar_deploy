@@ -1,10 +1,9 @@
 const SeasonalOffer = require('../models/SeasonalOffer');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/asyncHandler');
-const path = require('path');
-const fs = require('fs');
 const messages = require('../locales/messages');
 const { default: mongoose } = require('mongoose');
+const cloudinary = require('cloudinary').v2;
 
 // @desc    Get all seasonal offers
 // @route   GET /api/seasonal-offers
@@ -55,11 +54,25 @@ exports.getSeasonalOffer = asyncHandler(async (req, res, next) => {
 // @route   POST /api/seasonal-offers
 // @access  Private
 exports.createSeasonalOffer = asyncHandler(async (req, res, next) => {
+    // Store only the URL from Cloudinary
     if (req.file) {
-        req.body.image = `/uploads/images/offers/${req.file.filename}`;
+        req.body.image = req.file.path; // Cloudinary URL
     }
 
-    const offer = await SeasonalOffer.create(req.body);
+    const { title_en, title_ar, details_en, details_ar } = req.body;
+    const offerData = {
+        title: { en: title_en, ar: title_ar },
+        details: { en: details_en, ar: details_ar },
+        image: req.body.image || null,
+        show: req.body.show
+    };
+    
+    let offer;
+    if (title_en) {
+        offer = await SeasonalOffer.create(offerData);
+    } else {
+        offer = await SeasonalOffer.create(req.body);
+    }
 
     res.status(201).json({
         success: true,
@@ -87,13 +100,16 @@ exports.updateSeasonalOffer = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse({ en, ar }, 404));
     }
 
+    // Handle image update with Cloudinary
     if (req.file) {
-        const oldImagePath = path.join(__dirname, '../../public', offer.image);
-        if (fs.existsSync(oldImagePath)) {
-            fs.promises.unlink(oldImagePath);
+        // Extract public_id from existing URL if it exists and delete old image
+        if (offer.image) {
+            const publicId = offer.image.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(`Alweam/offers/${publicId}`);
         }
-
-        req.body.image = `/uploads/images/offers/${req.file.filename}`;
+        
+        // Store new image URL
+        req.body.image = req.file.path;
     }
 
     offer = await SeasonalOffer.findByIdAndUpdate(req.params.id, req.body, {
@@ -127,9 +143,10 @@ exports.deleteSeasonalOffer = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse({ en, ar }, 404));
     }
 
-    const imagePath = path.join(__dirname, '../../public', offer.image[0]);
-    if (fs.existsSync(imagePath)) {
-        fs.promises.unlink(imagePath);
+    // Delete image from Cloudinary if it exists
+    if (offer.image) {
+        const publicId = offer.image.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(`Alweam/offers/${publicId}`);
     }
 
     await offer.deleteOne();

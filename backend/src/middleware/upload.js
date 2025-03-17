@@ -1,83 +1,74 @@
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const ErrorResponse = require('../utils/errorResponse');
 
-// Create uploads directory if it doesn't exist
-const uploadsDirCars = path.join(__dirname, '../../public/uploads/images/cars');
-const uploadsDirOffers = path.join(__dirname, '../../public/uploads/images/offers');
-const uploadsDirNews = path.join(__dirname, '../../public/uploads/images/news');
-
-if (!fs.existsSync(uploadsDirCars)) {
-    fs.mkdirSync(uploadsDirCars, { recursive: true });
-}
-if (!fs.existsSync(uploadsDirOffers)) {
-    fs.mkdirSync(uploadsDirOffers, { recursive: true });
-}
-if (!fs.existsSync(uploadsDirNews)) {
-    fs.mkdirSync(uploadsDirNews, { recursive: true });
-}
-
-// Set storage engine
-const storageCar = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDirCars);
-    },
-    filename: function (req, file, cb) {
-        // Rename file to avoid collisions
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-    },
-});
-const storageOffer = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDirOffers);
-    },
-    filename: function (req, file, cb) {
-        // Rename file to avoid collisions
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-    },
-});
-const storageNews = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDirNews);
-    },
-    filename: function (req, file, cb) {
-        // Rename file to avoid collisions
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-    },
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // Check file type
 const fileFilter = (req, file, cb) => {
-    // Allowed extensions
-    const filetypes = /jpeg|jpg|png|webp/;
-    // Check extension
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // Check mime type
-    const mimetype = filetypes.test(file.mimetype);
+  // Allowed extensions
+  const filetypes = /jpeg|jpg|png|webp/;
+  // Check mime type
+  const mimetype = filetypes.test(file.mimetype);
 
-    if (mimetype && extname) {
-        return cb(null, true);
-    } else {
-        cb(new ErrorResponse(messages.imageOnly, 400));
-    }
+  if (mimetype) {
+    return cb(null, true);
+  } else {
+    cb(new ErrorResponse('Only image files are allowed!', 400));
+  }
 };
 
-// Initialize upload
-exports. uploadCar = multer({
-    storage: storageCar,
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 5000000 }, // Default to 5MB
-    fileFilter: fileFilter,
-});
-exports. uploadOffer = multer({
-    storage: storageOffer,
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 5000000 }, // Default to 5MB
-    fileFilter: fileFilter,
-});
-exports. uploadNews = multer({
-    storage: storageNews,
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 5000000 }, // Default to 5MB
-    fileFilter: fileFilter,
+// Configure storage for cars
+const storageCar = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'Alweam/cars',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 1200, crop: 'limit' }]
+  }
 });
 
-// module.exports = upload;
+// Configure storage for offers
+const storageOffer = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'Alweam/offers',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 1200, crop: 'limit' }]
+  }
+});
+
+// Configure storage for news
+const storageNews = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'Alweam/news',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 1200, crop: 'limit' }]
+  }
+});
+
+// Initialize upload middleware
+exports.uploadCar = multer({
+  storage: storageCar,
+  limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5000000 }, // Default to 5MB
+  fileFilter: fileFilter
+});
+
+exports.uploadOffer = multer({
+  storage: storageOffer,
+  limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5000000 },
+  fileFilter: fileFilter
+});
+
+exports.uploadNews = multer({
+  storage: storageNews,
+  limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5000000 },
+  fileFilter: fileFilter
+});

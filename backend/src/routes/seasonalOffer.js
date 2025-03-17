@@ -52,24 +52,19 @@ router.route('/').get(getSeasonalOffers);
  *               image:
  *                 type: string
  *                 format: binary
- *               title:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: The title of the seasonal offer in English
- *                   ar:
- *                     type: string
- *                     description: The title of the seasonal offer in Arabic
- *               details:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: Details about the seasonal offer in English
- *                   ar:
- *                     type: string
- *                     description: Details about the seasonal offer in Arabic
+ *                 description: Seasonal offer image file
+ *               title_en:
+ *                 type: string
+ *                 description: Seasonal offer title in English
+ *               title_ar:
+ *                 type: string
+ *                 description: Seasonal offer title in Arabic
+ *               details_en:
+ *                 type: string
+ *                 description: Seasonal offer details in English
+ *               details_ar:
+ *                 type: string
+ *                 description: Seasonal offer details in Arabic
  *               show:
  *                 type: boolean
  *                 description: Whether the offer is visible
@@ -81,6 +76,7 @@ router.route('/').get(getSeasonalOffers);
  *       401:
  *         description: Unauthorized (missing or invalid token)
  */
+
 router.route('/').post(protect, uploadOffer.single('image'), createSeasonalOffer);
 
 /**
@@ -125,27 +121,22 @@ router.route('/:id').get(getSeasonalOffer);
  *               image:
  *                 type: string
  *                 format: binary
- *               title:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: The updated title of the seasonal offer in English
- *                   ar:
- *                     type: string
- *                     description: The updated title of the seasonal offer in Arabic
- *               details:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: Updated details about the seasonal offer in English
- *                   ar:
- *                     type: string
- *                     description: Updated details about the seasonal offer in Arabic
+ *                 description: Seasonal offer image file
+ *               title_en:
+ *                 type: string
+ *                 description: Seasonal offer title in English
+ *               title_ar:
+ *                 type: string
+ *                 description: Seasonal offer title in Arabic
+ *               details_en:
+ *                 type: string
+ *                 description: Seasonal offer details in English
+ *               details_ar:
+ *                 type: string
+ *                 description: Seasonal offer details in Arabic
  *               show:
  *                 type: boolean
- *                 description: Whether the offer should be visible
+ *                 description: Whether the offer is visible
  *     responses:
  *       200:
  *         description: Seasonal offer updated successfully

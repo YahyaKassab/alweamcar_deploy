@@ -75,13 +75,13 @@ exports.deleteMake = asyncHandler(async (req, res, next) => {
   const make = await Make.findById(req.params.id);
 
   if (!make) {
-    return next(new ErrorResponse(`Make not found with id of ${req.params.id}`, 404));
+    return next(new ErrorResponse(messages.notFound, 404));
   }
 
-  await make.remove();
+  await Make.deleteOne(make)
 
   res.status(200).json({
     success: true,
-    message: 'Make deleted successfully'
+    message: messages.deleted
   });
 });

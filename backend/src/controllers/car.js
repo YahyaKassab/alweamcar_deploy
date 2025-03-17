@@ -2,10 +2,16 @@ const Car = require('../models/Car');
 const Make = require('../models/Make');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/asyncHandler');
-const path = require('path');
-const fs = require('fs');
 const mongoose = require('mongoose');
 const messages = require('../locales/messages');
+const cloudinary = require('cloudinary').v2;
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -24,9 +30,7 @@ exports.getCars = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   
   const total = await Car.countDocuments(query);
-  const cars = await Car.find(query).populate('make',
-    'name'
-  )
+  const cars = await Car.find(query)
     .skip(skip)
     .limit(parseInt(limit, 10))
     .sort('-createdAt');
@@ -105,13 +109,14 @@ exports.createCar = asyncHandler(async (req, res, next) => {
     carData.make = make._id;
   }
 
+  // Handle Cloudinary image upload (req.files comes from multer-storage-cloudinary)
   if (req.files && req.files.length > 0) {
-    carData.images = req.files.map(file => `/uploads/images/cars/${file.filename}`);
+    carData.images = req.files.map(file => file.path);
   }
 
   const car = await Car.create(carData);
   
-  res.status(201).json({ success: true, data: car });
+  res.status(201).json({ success: true, data: car});
 });
 
 // @desc    Update car
@@ -146,16 +151,21 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
     carData.make = make._id;
   }
 
+  // Handle Cloudinary image upload
   if (req.files && req.files.length > 0) {
-    const newImagePaths = req.files.map(file => `/uploads/images/cars/${file.filename}`);
+    const newImagePaths = req.files.map(file => file.path);
 
     if (req.body.replaceImages === 'true') {
-      car.images.forEach(image => {
-        const imagePath = path.join(__dirname, '/uploads/images/cars', image);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
+      // Delete existing images from Cloudinary
+      for (const imageUrl of car.images) {
+        try {
+          const publicId = imageUrl.split('/').pop().split('.')[0];
+          await cloudinary.uploader.destroy(`Alweam/cars/${publicId}`);
+          console.log(`Deleted image from Cloudinary: ${publicId}`);
+        } catch (error) {
+          console.error('Failed to delete image from Cloudinary:', error);
         }
-      });
+      }
       carData.images = newImagePaths;
     } else {
       carData.images = [...car.images, ...newImagePaths];
@@ -176,14 +186,18 @@ exports.deleteCar = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(messages.notFound, 404));
   }
 
-  car.images.forEach(image => {
-    const imagePath = path.join(__dirname, '/uploads/images/cars', image);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
+  // Delete images from Cloudinary
+  for (const imageUrl of car.images) {
+    try {
+      const publicId = imageUrl.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`Alweam/cars/${publicId}`);
+      console.log(`Deleted image from Cloudinary: ${publicId}`);
+    } catch (error) {
+      console.error('Failed to delete image from Cloudinary:', error);
     }
-  });
+  }
 
-  await car.remove();
+  await Car.deleteOne(car);
 
-  res.status(200).json({ success: true, data: {} });
+  res.status(200).json({ success: true, message: messages.deleted });
 });

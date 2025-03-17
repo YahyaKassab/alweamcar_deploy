@@ -71,4 +71,9 @@ const CarSchema = new mongoose.Schema({
     timestamps: true // This automatically creates createdAt and updatedAt fields
 });
 
+CarSchema.pre(/^find/, function (next) {
+    this.populate('make','name')
+    next();
+  });
+
 module.exports = mongoose.model('Car', CarSchema);

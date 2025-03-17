@@ -16,8 +16,12 @@ function parseErrorMessage(message) {
 
 // Usage in Express error handler
 const errorHandler = (err, req, res, next) => {
+    console.error('Error:', err); // Logs the full error for debugging
+
     let statusCode = err.statusCode || 500;
     let message = err.message;
+
+    // Handle MongoDB Duplicate Key Error
     if (err.code === 11000) {
         const field = Object.keys(err.keyPattern)[0]; // Extract the field causing the duplicate error
         let { ar, en } = messages.duplicate_key;
@@ -30,9 +34,10 @@ const errorHandler = (err, req, res, next) => {
     res.status(statusCode).json({
         success: false,
         message: parseErrorMessage(message) || {
-            en: 'Unexpected error occurred.',
-            ar: 'حدث خطأ غير متوقع.',
+            en: 'Something went wrong, please try again later.',
+            ar: 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى لاحقًا.',
         },
     });
 };
+
 module.exports = errorHandler;
