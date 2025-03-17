@@ -15,6 +15,11 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
       - MONGO_INITDB_DATABASE=car-website
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   backend:
     build:
@@ -39,6 +44,11 @@ services:
       - JWT_SECRET=your_jwt_secret_key
       - EMAIL_PASSWORD=lgpo gbls xgem vqzv
       - EMAIL_USERNAME=ya7yakassab@gmail.com
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
     build:
@@ -52,6 +62,11 @@ services:
       - backend
     networks:
       - alweam-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   alweam-network:
