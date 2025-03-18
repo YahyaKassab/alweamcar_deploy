@@ -4,7 +4,7 @@ import NewsEditor from './NewsEditor';
 import NewsDisplay from './NewsDisplay';
 
 const App = () => {
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fallback for local testing
+  // const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fallback for local testing
 
   const [news, setNews] = useState(null); // Null initially to handle loading state
   const [cars, setCars] = useState(null);
@@ -28,29 +28,29 @@ const App = () => {
     const fetchData = async () => {
       try {
         // Fetch news
-        const newsResponse = await axios.get(`${API_URL}/news`);
+        const newsResponse = await axios.get(`/news`);
         console.log('news: ',newsResponse.data.data)
         setNews(newsResponse.data.data); // Axios automatically parses JSON into .data.data
 
         // Fetch cars
-        const carsResponse = await axios.get(`${API_URL}/cars`);
+        const carsResponse = await axios.get(`/cars`);
         setCars(carsResponse.data.data);
-        const offersResponse = await axios.get(`${API_URL}/seasonal-offers`);
+        const offersResponse = await axios.get(`/seasonal-offers`);
         setOffers(offersResponse.data.data);
         // Fetch admins
-        const adminsResponse = await axios.get(`${API_URL}/admins`);
+        const adminsResponse = await axios.get(`/admins`);
         console.log('Admins Response:', adminsResponse.data);
         if (Array.isArray(adminsResponse.data.data)) setAdmins(adminsResponse.data.data);
         else throw new Error('Admins data is not an array');
 
         // Fetch makes
-        const makesResponse = await axios.get(`${API_URL}/makes`);
+        const makesResponse = await axios.get(`/makes`);
         console.log('Makes Response:', makesResponse.data.data);
         if (Array.isArray(makesResponse.data.data)) setMakes(makesResponse.data.data);
         else throw new Error('Makes data is not an array');
 
         // Fetch feedbacks
-        const feedbacksResponse = await axios.get(`${API_URL}/feedback`);
+        const feedbacksResponse = await axios.get(`/feedback`);
         console.log('Feedbacks Response:', feedbacksResponse.data.data);
         if (Array.isArray(feedbacksResponse.data.data)) setFeedbacks(feedbacksResponse.data.data);
         else throw new Error('Feedbacks data is not an array');

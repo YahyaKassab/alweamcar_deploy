@@ -58,7 +58,7 @@ const NewsEditor = () => {
         newsData.append('image', formData.image);
       }
       
-      await axios.post(`${API_URL}/news`, newsData);
+      await axios.post(`/news`, newsData);
       
       setMessage({ type: 'success', text: 'News created successfully!' });
       setFormData({
