@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import NewsEditor from './NewsEditor';
+import NewsDisplay from './NewsDisplay';
 
 const App = () => {
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fallback for local testing
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fallback for local testing
 
   const [news, setNews] = useState(null); // Null initially to handle loading state
   const [cars, setCars] = useState(null);
@@ -12,8 +14,14 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fall
   const [error, setError] = useState(null);
   const [feedbacks, setFeedbacks] = useState(null);
   const [language, setLanguage] = useState('en');
+  const [showEditor, setShowEditor] = useState(false);
+  
   const toggleLanguage = () => {
     setLanguage((prevLang) => (prevLang === 'en' ? 'ar' : 'en'));
+  };
+
+  const toggleEditor = () => {
+    setShowEditor((prev) => !prev);
   };
 
   useEffect(() => {
@@ -99,6 +107,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fall
     overflowX: 'auto',
     gap: '10px',
   };
+  
   const buttonStyle = {
     padding: '10px 20px',
     fontSize: '1rem',
@@ -108,6 +117,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fall
     borderRadius: '5px',
     cursor: 'pointer',
     marginBottom: '20px',
+    marginRight: '10px',
   };
 
   const carImageStyle = {
@@ -143,32 +153,25 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fall
   // Render loading state or data
   return (
     <div style={containerStyle}>
-      {/* News Section */}
+      {/* News Section with Editor Toggle */}
       <h1 style={sectionTitleStyle}>Latest News</h1>
-      <button onClick={toggleLanguage} style={buttonStyle}>
-        Switch to {language === 'en' ? 'Arabic' : 'English'}
-      </button>
+      <div>
+        <button onClick={toggleLanguage} style={buttonStyle}>
+          Switch to {language === 'en' ? 'Arabic' : 'English'}
+        </button>
+        <button onClick={toggleEditor} style={buttonStyle}>
+          {showEditor ? 'Hide News Editor' : 'Show News Editor'}
+        </button>
+      </div>
+      
+      {/* News Editor (Toggle) */}
+      {showEditor && <NewsEditor />}
+      
+      {/* News Display */}
       {!news ? (
         <p>Loading news...</p>
       ) : (
-        <div style={gridStyle}>
-          {news.map((newsItem) => (
-            <div key={newsItem._id} style={cardStyle}>
-              <img src={newsItem.image} alt={newsItem.title[language]} style={imageStyle} />
-              <div style={cardContentStyle}>
-                <h2 style={titleStyle}>{newsItem.title[language]}</h2>
-                <p style={detailsStyle}>{newsItem.details[language]}</p>
-                <p style={dateStyle}>
-                  {new Date(newsItem.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <NewsDisplay newsItems={news} language={language} />
       )}
   
       {/* Special Offers Section */}
@@ -290,4 +293,4 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // Fall
   );
 
 }
-export default App
+export default App;

@@ -3,6 +3,7 @@ const fs = require('fs');
 const dotenv = require("dotenv");
 const cloudinary = require("cloudinary").v2;
 const Car = require("../models/Car");
+const SeasonalOffer = require("../models/SeasonalOffer");
 const Feedback = require("../models/Feedback");
 const News = require("../models/News");
 const Make = require("../models/Make");
@@ -56,6 +57,7 @@ const wipeDatabase = async () => {
 
     // Wipe MongoDB collections
     await Car.deleteMany();
+    await SeasonalOffer.deleteMany();
     await Feedback.deleteMany();
     await News.deleteMany();
     await Make.deleteMany();

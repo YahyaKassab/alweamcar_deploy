@@ -10,7 +10,7 @@ const NewsSchema = new mongoose.Schema({
         },
         ar: {
             type: String,
-            required: [true, messages.titleRequired.en],
+            required: [true, messages.titleRequired.ar],
             trim: true,
         },
     },
@@ -22,10 +22,12 @@ const NewsSchema = new mongoose.Schema({
         en: {
             type: String,
             required: [true, messages.detailsRequired.en],
+            contentType: 'markdown', // Specify content type as markdown
         },
         ar: {
             type: String,
-            required: [true, messages.detailsRequired.en],
+            required: [true, messages.detailsRequired.ar],
+            contentType: 'markdown', // Specify content type as markdown
         },
     },
     date: {
