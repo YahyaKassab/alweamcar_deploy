@@ -6,8 +6,18 @@ const helmet = require('helmet');
 const path = require('path');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const rateLimit = require('express-rate-limit');
 const { swaggerUi, swaggerDocs } = require('./config/swagger');
 const { createRootAdmin } = require('./adminSeeder');
+// Rate limiter configuration
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: {en:'Too many requests from this IP, please try again after 15 minutes',ar:'أرسلت الكثير من الطلبات، حاول مجددا بعد 15 دقيقة'},
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 
 // Load environment variables
 dotenv.config();
@@ -24,10 +34,10 @@ const whatWeDoRoutes = require('./routes/whatWeDo');
 const newsRoutes = require('./routes/news');
 const feedbackRoutes = require('./routes/feedback');
 const makeRoutes = require('./routes/make');
-const sendEmail = require('./utils/sendEmail');
-const { seedData } = require('./dataSeeder');
+
 
 const app = express();
+app.use(limiter);
 
 // Create root admin upon startup
 (async () => {
@@ -42,10 +52,6 @@ const app = express();
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use((req, res, next) => {
-//     req.language = req.headers['accept-language'] === 'ar' ? 'ar' : 'en';
-//     next();
-// });
 
 // Enable CORS
 app.use(cors());
