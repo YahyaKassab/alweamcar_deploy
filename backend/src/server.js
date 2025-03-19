@@ -34,6 +34,7 @@ const whatWeDoRoutes = require('./routes/whatWeDo');
 const newsRoutes = require('./routes/news');
 const feedbackRoutes = require('./routes/feedback');
 const makeRoutes = require('./routes/make');
+const termsRoutes = require('./routes/Terms');
 
 
 const app = express();
@@ -79,6 +80,7 @@ app.use('/api/what-we-do', whatWeDoRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/makes', makeRoutes);
+app.use('/api/terms', termsRoutes);
 
 // app.get('/send-test-email', async (req, res) => {
 //     try {
