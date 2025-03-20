@@ -1,145 +1,17 @@
 const express = require('express');
 const {
-    getCars,
-    getCar,
-    createCar,
-    updateCar,
-    deleteCar,
-    getSimilarCars,
-    getMakes,
+  getCars,
+  getCar,
+  createCar,
+  updateCar,
+  deleteCar,
+  getSimilarCars,
+  getMakes,
 } = require('../controllers/car');
 const { protect } = require('../middleware/auth');
-const {uploadCar} = require('../middleware/upload');
+const { uploadCar } = require('../middleware/upload');
 
 const router = express.Router();
-
-/**
- * @swagger
- * components:
- *  schemas:
- *    Car:
- *      type: object
- *      required:
- *        - make
- *        - model
- *        - year
- *        - condition
- *        - mileage
- *        - stockNumber
- *        - name
- *        - price
- *        - images
- *      properties:
- *        _id:
- *          type: string
- *          description: Auto-generated ID of the car
- *        make:
- *          type: string
- *          description: Car manufacturer
- *        model:
- *          type: string
- *          description: Car model
- *        year:
- *          type: integer
- *          description: Manufacturing year
- *        condition:
- *          type: string
- *          enum: [Brand New, Elite Approved]
- *          description: Car condition
- *        mileage:
- *          type: number
- *          description: Car mileage in kilometers/miles
- *        stockNumber:
- *          type: string
- *          description: Unique stock identification number
- *        exteriorColor:
- *          type: string
- *          description: Exterior color of the car
- *        interiorColor:
- *          type: string
- *          description: Interior color of the car
- *        engine:
- *          type: string
- *          description: Engine specifications
- *        bhp:
- *          type: number
- *          description: Brake horsepower
- *        door:
- *          type: integer
- *          description: Number of doors
- *        warranty:
- *          type: boolean
- *          description: Whether the car has warranty
- *        name:
- *          type: string
- *          description: Full name/title of the car listing
- *        price:
- *          type: number
- *          description: Car price
- *        images:
- *          type: array
- *          items:
- *            type: string
- *          description: Array of image paths
- *        createdAt:
- *          type: string
- *          format: date-time
- *          description: Date when the entry was created
- *        updatedAt:
- *          type: string
- *          format: date-time
- *          description: Date when the entry was last updated
- *      example:
- *        make: Toyota
- *        model: Camry
- *        year: 2023
- *        condition: Brand New
- *        mileage: 0
- *        stockNumber: TYT-00123
- *        exteriorColor: White
- *        interiorColor: Beige
- *        engine: 2.5L 4-Cylinder
- *        bhp: 203
- *        door: 4
- *        warranty: true
- *        name: Toyota Camry LE
- *        price: 26520
- *        images: ["/uploads/images/car-1234567890.jpg"]
- */
-
-// /**
-//  * @swagger
-//  * /api/cars/makes:
-//  *   get:
-//  *     summary: Get all car makes with their respective models
-//  *     tags: [Cars]
-//  *     responses:
-//  *       200:
-//  *         description: List of all car makes with associated models
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 success:
-//  *                   type: boolean
-//  *                 count:
-//  *                   type: integer
-//  *                 data:
-//  *                   type: array
-//  *                   items:
-//  *                     type: object
-//  *                     properties:
-//  *                       make:
-//  *                         type: string
-//  *                         example: "Toyota"
-//  *                       models:
-//  *                         type: array
-//  *                         items:
-//  *                           type: string
-//  *                         example: ["Corolla", "Camry"]
-//  */
-// router.get('/makes', getMakes);
 
 /**
  * @swagger
@@ -186,12 +58,12 @@ router.get('/:id/similar', getSimilarCars);
  *         name: make
  *         schema:
  *           type: string
- *         description: Car make to filter by
+ *         description: Car make ID to filter by
  *       - in: query
  *         name: model
  *         schema:
  *           type: string
- *         description: Car model to filter by
+ *         description: Car model (English) to filter by
  *       - in: query
  *         name: year
  *         schema:
@@ -250,8 +122,6 @@ router.get('/:id/similar', getSimilarCars);
  *   post:
  *     summary: Create a new car
  *     tags: [Cars]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -260,19 +130,36 @@ router.get('/:id/similar', getSimilarCars);
  *             type: object
  *             required:
  *               - make
- *               - model
+ *               - model[en]
+ *               - model[ar]
  *               - year
  *               - condition
  *               - mileage
  *               - stockNumber
- *               - name
+ *               - name[en]
+ *               - name[ar]
  *               - price
- *               - images
  *             properties:
  *               make:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English name of the make
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic name of the make
+ *                 description: Make object or existing Make ID
  *               model:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English model name
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic model name
+ *                 required: [en, ar]
  *               year:
  *                 type: integer
  *               condition:
@@ -283,26 +170,70 @@ router.get('/:id/similar', getSimilarCars);
  *               stockNumber:
  *                 type: string
  *               exteriorColor:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English exterior color
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic exterior color
  *               interiorColor:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English interior color
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic interior color
  *               engine:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English engine description
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic engine description
  *               bhp:
- *                 type: number
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English brake horsepower
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic brake horsepower
  *               door:
  *                 type: integer
  *               warranty:
  *                 type: boolean
  *               name:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English car name
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic car name
+ *                 required: [en, ar]
  *               price:
  *                 type: number
  *               images:
  *                 type: array
  *                 items:
- *                   type: string
- *                   format: binary
+ *                   type: object
+ *                   properties:
+ *                     url:
+ *                       type: string
+ *                       format: binary
+ *                       description: Image file or URL
+ *                     main:
+ *                       type: boolean
+ *                       description: Whether this is the main image (first image is set as main by default)
+ *                   example: { "url": "image1.jpg", "main": true }
  *     responses:
  *       201:
  *         description: Car created successfully
@@ -353,8 +284,6 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images', 10), crea
  *   put:
  *     summary: Update a car
  *     tags: [Cars]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -370,9 +299,24 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images', 10), crea
  *             type: object
  *             properties:
  *               make:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English name of the make
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic name of the make
+ *                 description: Make object or existing Make ID
  *               model:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English model name
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic model name
  *               year:
  *                 type: integer
  *               condition:
@@ -383,26 +327,69 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images', 10), crea
  *               stockNumber:
  *                 type: string
  *               exteriorColor:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English exterior color
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic exterior color
  *               interiorColor:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English interior color
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic interior color
  *               engine:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English engine description
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic engine description
  *               bhp:
- *                 type: number
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English brake horsepower
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic brake horsepower
  *               door:
  *                 type: integer
  *               warranty:
  *                 type: boolean
  *               name:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: English car name
+ *                   ar:
+ *                     type: string
+ *                     description: Arabic car name
  *               price:
  *                 type: number
  *               images:
  *                 type: array
  *                 items:
- *                   type: string
- *                   format: binary
+ *                   type: object
+ *                   properties:
+ *                     url:
+ *                       type: string
+ *                       format: binary
+ *                       description: Image file or URL
+ *                     main:
+ *                       type: boolean
+ *                       description: Whether this is the main image (first image is set as main by default)
+ *                   example: { "url": "image1.jpg", "main": true }
  *               replaceImages:
  *                 type: string
  *                 enum: ['true', 'false']
@@ -429,8 +416,6 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images', 10), crea
  *   delete:
  *     summary: Delete a car
  *     tags: [Cars]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -456,9 +441,9 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images', 10), crea
  *         description: Car not found
  */
 router
-    .route('/:id')
-    .get(getCar)
-    .put(protect, uploadCar.array('images', 10), updateCar)
-    .delete(protect, deleteCar);
+  .route('/:id')
+  .get(getCar)
+  .put(protect, uploadCar.array('images', 10), updateCar)
+  .delete(protect, deleteCar);
 
 module.exports = router;

@@ -1,38 +1,85 @@
 [
-    {
-      "make": "Toyota",
-      "model": "Camry",
-      "year": 2022,
-      "condition": "Brand New",
-      "mileage": 0,
-      "stockNumber": "TOY123456",
-      "exteriorColor": "White",
-      "interiorColor": "Beige",
-      "engine": "2.5L 4-Cylinder",
-      "bhp": 203,
-      "door": 4,
-      "warranty": true,
-      "name": "Toyota Camry 2022",
-      "price": 28000,
-      "images": ["1.jpg", "2.jpg", "3.jpg"]
+  {
+    "make": {
+      "en": "Toyota",
+      "ar": "تويوتا"
     },
-    {
-      "make": "Honda",
-      "model": "Civic",
-      "year": 2021,
-      "condition": "Elite Approved",
-      "mileage": 12000,
-      "stockNumber": "HON456789",
-      "exteriorColor": "Black",
-      "interiorColor": "Gray",
-      "engine": "1.5L Turbocharged 4-Cylinder",
-      "bhp": 174,
-      "door": 4,
-      "warranty": false,
-      "name": "Honda Civic 2021",
-      "price": 22000,
-      "images": ["4.jpg", "5.jpg"]
-    }
-
-  ]
-  
+    "model": {
+      "en": "Camry",
+      "ar": "كامري"
+    },
+    "year": 2022,
+    "condition": "Brand New",
+    "mileage": 0,
+    "stockNumber": "TOY123456",
+    "exteriorColor": {
+      "en": "White",
+      "ar": "أبيض"
+    },
+    "interiorColor": {
+      "en": "Beige",
+      "ar": "بيج"
+    },
+    "engine": {
+      "en": "2.5L 4-Cylinder",
+      "ar": "2.5 لتر 4 أسطوانات"
+    },
+    "bhp": {
+      "en": "203",
+      "ar": "203"
+    },
+    "door": 4,
+    "warranty": true,
+    "name": {
+      "en": "Toyota Camry 2022",
+      "ar": "تويوتا كامري 2022"
+    },
+    "price": 28000,
+    "images": [
+      { "url": "1.jpg", "main": true },
+      { "url": "2.jpg", "main": false },
+      { "url": "3.jpg", "main": false }
+    ]
+  },
+  {
+    "make": {
+      "en": "Honda",
+      "ar": "هوندا"
+    },
+    "model": {
+      "en": "Civic",
+      "ar": "سيفيك"
+    },
+    "year": 2021,
+    "condition": "Elite Approved",
+    "mileage": 12000,
+    "stockNumber": "HON456789",
+    "exteriorColor": {
+      "en": "Black",
+      "ar": "أسود"
+    },
+    "interiorColor": {
+      "en": "Gray",
+      "ar": "رمادي"
+    },
+    "engine": {
+      "en": "1.5L Turbocharged 4-Cylinder",
+      "ar": "1.5 لتر تيربو 4 أسطوانات"
+    },
+    "bhp": {
+      "en": "174",
+      "ar": "174"
+    },
+    "door": 4,
+    "warranty": false,
+    "name": {
+      "en": "Honda Civic 2021",
+      "ar": "هوندا سيفيك 2021"
+    },
+    "price": 22000,
+    "images": [
+      { "url": "4.jpg", "main": true },
+      { "url": "5.jpg", "main": false }
+    ]
+  }
+]

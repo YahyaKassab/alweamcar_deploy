@@ -1,11 +1,11 @@
 const express = require('express');
 const {
-    register,
-    login,
-    getMe,
-    logout,
-    resetPassword,
-    forgotPassword,
+  login,
+  getMe,
+  logout,
+  forgotPassword,
+  resetPassword,
+  changePassword, // Add this
 } = require('../controllers/auth');
 const { protect } = require('../middleware/auth');
 
@@ -15,74 +15,37 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Auth
- *   description: Authentication endpoints
+ *   description: Authentication and admin management
  */
-
-/**
- * @swagger
- * /api/auth/register:
- *   post:
- *     summary: Register a new admin
- *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *               - mobile
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 format: password
- *               mobile:
- *                 type: string
- *     responses:
- *       201:
- *         description: Admin registered successfully
- */
-router.post('/register', protect, register);
 
 /**
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Login an admin
+ *     summary: Login admin
  *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
  *             properties:
  *               email:
  *                 type: string
- *                 format: email
  *               password:
  *                 type: string
- *                 format: password
+ *             required:
+ *               - email
+ *               - password
  *     responses:
  *       200:
- *         description: Admin logged in successfully, returns JWT token
+ *         description: Successfully logged in
+ *       400:
+ *         description: Missing email or password
+ *       401:
+ *         description: Invalid credentials
  */
-router.post('/login', login);
 
 /**
  * @swagger
@@ -94,115 +57,130 @@ router.post('/login', login);
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Admin profile data
+ *         description: Admin details
+ *       401:
+ *         description: Not authorized
  */
-router.get('/me', protect, getMe);
-
-/**
- * @swagger
- * /api/auth/forgotpassword:
- *   post:
- *     summary: Send password reset email
- *     tags: [Authentication]
- *     description: Sends an email with a password reset link to the admin.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: "admin@example.com"
- *     responses:
- *       200:
- *         description: Email sent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: "Email sent"
- *       404:
- *         description: Admin not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-router.post('/forgotpassword', forgotPassword);
-
-/**
- * @swagger
- * /api/auth/resetpassword/{resetToken}:
- *   put:
- *     summary: Reset admin password
- *     tags: [Authentication]
- *     description: Resets the admin's password using the provided reset resetToken.
- *     parameters:
- *       - in: path
- *         name: resetToken
- *         required: true
- *         description: Password reset token received in the email.
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - password
- *             properties:
- *               password:
- *                 type: string
- *                 format: password
- *                 example: "newSecurePassword123"
- *     responses:
- *       200:
- *         description: Password reset successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 resetToken:
- *                   type: string
- *                   example: "newJwtTokenHere"
- *       400:
- *         description: Invalid or expired token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-router.put('/resetpassword/:resetToken', resetPassword);
 
 /**
  * @swagger
  * /api/auth/logout:
  *   get:
- *     summary: Logout the admin
+ *     summary: Log admin out
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Admin logged out successfully
+ *         description: Successfully logged out
  */
-router.get('/logout', protect, logout);
+
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Request password reset
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *             required:
+ *               - email
+ *     responses:
+ *       200:
+ *         description: Reset email sent
+ *       404:
+ *         description: Admin not found
+ *       500:
+ *         description: Email sending failed
+ */
+
+/**
+ * @swagger
+ * /api/auth/reset-password/{resetToken}:
+ *   put:
+ *     summary: Reset password with token
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: resetToken
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Password reset token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *             required:
+ *               - password
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *       400:
+ *         description: Invalid or expired token
+ */
+
+/**
+ * @swagger
+ * /api/auth/change-password:
+ *   put:
+ *     summary: Change admin password
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: Current password
+ *               newPassword:
+ *                 type: string
+ *                 description: New password
+ *             required:
+ *               - oldPassword
+ *               - newPassword
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Missing old or new password
+ *       401:
+ *         description: Invalid old password or not authorized
+ *       404:
+ *         description: Admin not found
+ */
+
+router.route('/login').post(login);
+router.route('/me').get(protect, getMe);
+router.route('/logout').get(protect, logout);
+router.route('/forgot-password').post(forgotPassword);
+router.route('/reset-password/:resetToken').put(resetPassword);
+router.route('/change-password').put(protect, changePassword); // Add this
 
 module.exports = router;

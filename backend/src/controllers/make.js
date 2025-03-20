@@ -9,21 +9,39 @@ const ErrorResponse = require('../utils/errorResponse');
 exports.createMake = asyncHandler(async (req, res, next) => {
   const { name, models } = req.body;
 
-  if (!name) {
+  // Validate name object
+  if (!name || !name.en || !name.ar) {
     return next(new ErrorResponse(messages.makeRequired, 400));
   }
 
-  const existingMake = await Make.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+  // Check for existing make using English name
+  const existingMake = await Make.findOne({
+    'name.en': { $regex: new RegExp(`^${name.en.trim()}$`, 'i') },
+  });
 
   if (existingMake) {
     return next(new ErrorResponse(messages.duplicate_key, 400));
   }
 
-  const make = await Make.create({ name, models: models || [] });
+  // Ensure models is an array of objects with en and ar fields (if provided)
+  const formattedModels = models
+    ? models.map((model) => ({
+        en: model.en ? model.en.trim() : '',
+        ar: model.ar ? model.ar.trim() : '',
+      }))
+    : [];
+
+  const make = await Make.create({
+    name: {
+      en: name.en.trim(),
+      ar: name.ar.trim(),
+    },
+    models: formattedModels,
+  });
 
   res.status(201).json({
     success: true,
-    data: make
+    data: make,
   });
 });
 
@@ -31,17 +49,14 @@ exports.createMake = asyncHandler(async (req, res, next) => {
 // @route   GET /api/makes
 // @access  Public
 exports.getMakes = asyncHandler(async (req, res) => {
-
   const total = await Make.countDocuments();
-
-  const makes = await Make.find({}, 'name models')
-    .sort('name');
+  const makes = await Make.find({}, 'name models').sort('name.en'); // Sort by English name
 
   res.status(200).json({
     success: true,
     count: makes.length,
     total,
-    data: makes
+    data: makes,
   });
 });
 
@@ -57,14 +72,35 @@ exports.updateMake = asyncHandler(async (req, res, next) => {
 
   const { name, models } = req.body;
 
-  if (name) make.name = name;
-  if (models) make.models = models;
+  // Update name if provided
+  if (name) {
+    if (!name.en || !name.ar) {
+      return next(new ErrorResponse(messages.makeRequired, 400));
+    }
+    // Check for duplicate English name (excluding current make)
+    const existingMake = await Make.findOne({
+      'name.en': { $regex: new RegExp(`^${name.en.trim()}$`, 'i') },
+      _id: { $ne: make._id },
+    });
+    if (existingMake) {
+      return next(new ErrorResponse(messages.duplicate_key, 400));
+    }
+    make.name = { en: name.en.trim(), ar: name.ar.trim() };
+  }
+
+  // Update models if provided
+  if (models) {
+    make.models = models.map((model) => ({
+      en: model.en ? model.en.trim() : '',
+      ar: model.ar ? model.ar.trim() : '',
+    }));
+  }
 
   await make.save();
 
   res.status(200).json({
     success: true,
-    data: make
+    data: make,
   });
 });
 
@@ -78,10 +114,10 @@ exports.deleteMake = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(messages.notFound, 404));
   }
 
-  await Make.deleteOne(make)
+  await Make.deleteOne({ _id: make._id });
 
   res.status(200).json({
     success: true,
-    message: messages.deleted
+    message: messages.deleted,
   });
 });

@@ -1,10 +1,10 @@
 const express = require('express');
 const {
-    getAdmins,
-    getAdmin,
-    createAdmin,
-    updateAdmin,
-    deleteAdmin,
+  getAdmins,
+  getAdmin,
+  createAdmin,
+  updateAdmin,
+  deleteAdmin,
 } = require('../controllers/admin');
 const { protect } = require('../middleware/auth');
 
@@ -23,16 +23,14 @@ const router = express.Router();
  *   get:
  *     summary: Get all admins
  *     tags: [Admins]
- *     security:
- *       - bearerAuth: []
+
  *     responses:
  *       200:
  *         description: List of admins
  *   post:
  *     summary: Create a new admin
  *     tags: [Admins]
- *     security:
- *       - bearerAuth: []
+
  *     requestBody:
  *       required: true
  *       content:
@@ -61,8 +59,7 @@ router.route('/').get(protect, getAdmins).post(protect, createAdmin);
  *   get:
  *     summary: Get a single admin by ID
  *     tags: [Admins]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: path
  *         name: id
@@ -77,8 +74,7 @@ router.route('/').get(protect, getAdmins).post(protect, createAdmin);
  *   put:
  *     summary: Update an admin
  *     tags: [Admins]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: path
  *         name: id
@@ -106,8 +102,7 @@ router.route('/').get(protect, getAdmins).post(protect, createAdmin);
  *   delete:
  *     summary: Delete an admin
  *     tags: [Admins]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: path
  *         name: id

@@ -19,23 +19,17 @@ exports.getCars = asyncHandler(async (req, res) => {
   const { make, model, year, condition, page = 1, limit = 10 } = req.query;
 
   const query = {};
-  // If searching by make name instead of ID
-  if (make) {
-    const makeDoc = await Make.findOne({ name: make });
-    if (makeDoc) query.make = makeDoc._id;
+  if (make && isValidObjectId(make)) {
+    query.make = make;
   }
-  if (model) query.model = model;
+  if (model) query['model.en'] = model;
   if (year) query.year = year;
   if (condition) query.condition = condition;
 
   const skip = (page - 1) * limit;
 
   const total = await Car.countDocuments(query);
-  const cars = await Car.find(query)
-    .populate('make', 'make')
-    .skip(skip)
-    .limit(parseInt(limit, 10))
-    .sort('-createdAt');
+  const cars = await Car.find(query).skip(skip).limit(parseInt(limit, 10)).sort('-createdAt');
 
   res.status(200).json({
     success: true,
@@ -49,11 +43,9 @@ exports.getCars = asyncHandler(async (req, res) => {
     data: cars,
   });
 });
-// @desc    Get single car
-// @route   GET /api/cars/:id
-// @access  Public
+
 exports.getCar = asyncHandler(async (req, res, next) => {
-  const car = await Car.findById(req.params.id).populate('make', 'name');
+  const car = await Car.findById(req.params.id);
   if (!car) {
     return next(new ErrorResponse(messages.notFound, 404));
   }
@@ -61,58 +53,85 @@ exports.getCar = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: car });
 });
 
-// @desc    Get similar cars (same make)
-// @route   GET /api/cars/:id/similar
-// @access  Public
 exports.getSimilarCars = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
   if (!car) {
     return next(new ErrorResponse(messages.notFound, 404));
   }
 
-  const similarCars = await Car.find({ make: car.make, _id: { $ne: car._id } }).limit(6);
+  const similarCars = await Car.find({
+    make: car.make,
+    _id: { $ne: car._id },
+  }).limit(6);
 
-  res.status(200).json({ success: true, count: similarCars.length, data: similarCars });
+  res.status(200).json({
+    success: true,
+    count: similarCars.length,
+    data: similarCars,
+  });
 });
 
-// @desc    Get all makes
-// @route   GET /api/cars/makes
-// @access  Public
 exports.getMakes = asyncHandler(async (req, res) => {
-  const makes = await Make.find({}, 'name models');
-  res.status(200).json({ success: true, count: makes.length, data: makes });
-});
+  const total = await Make.countDocuments();
+  const makes = await Make.find({}, 'name models').sort('name.en'); // Sort by English name
 
-// @desc    Create new car
-// @route   POST /api/cars
-// @access  Private
+  res.status(200).json({
+    success: true,
+    count: makes.length,
+    total,
+    data: makes,
+  });
+});
 exports.createCar = asyncHandler(async (req, res, next) => {
   const carData = { ...req.body };
 
+  // Handle make/model creation (unchanged)
   if (!isValidObjectId(carData.make)) {
-    const { make: makeName, model } = carData;
-    if (!makeName || !model) {
+    const { make, model } = carData;
+    if (!make?.en || !make?.ar || !model?.en || !model?.ar) {
       return next(new ErrorResponse(messages.make_model_required, 400));
     }
 
-    const normalizedMakeName = makeName.trim().toLowerCase();
-    const normalizedModel = model.trim();
+    const normalizedMakeNameEn = make.en.trim().toLowerCase();
+    const normalizedMakeNameAr = make.ar.trim().toLowerCase();
+    const normalizedModelEn = model.en.trim();
+    const normalizedModelAr = model.ar.trim();
 
-    let make = await Make.findOne({ name: { $regex: new RegExp(`^${normalizedMakeName}$`, 'i') } });
+    let makeDoc = await Make.findOne({
+      'name.en': { $regex: new RegExp(`^${normalizedMakeNameEn}$`, 'i') },
+    });
 
-    if (!make) {
-      make = await Make.create({ name: makeName, models: [normalizedModel] });
-    } else if (!make.models.some((m) => m.toLowerCase() === normalizedModel.toLowerCase())) {
-      make.models.push(normalizedModel);
-      await make.save();
+    if (!makeDoc) {
+      makeDoc = await Make.create({
+        name: { en: make.en, ar: make.ar },
+        models: [{ en: normalizedModelEn, ar: normalizedModelAr }],
+      });
+    } else {
+      const modelExists = makeDoc.models.some(
+        (m) => m.en.toLowerCase() === normalizedModelEn.toLowerCase()
+      );
+      if (!modelExists) {
+        makeDoc.models.push({ en: normalizedModelEn, ar: normalizedModelAr });
+        await makeDoc.save();
+      }
     }
 
-    carData.make = make._id;
+    carData.make = makeDoc._id;
+    carData.model = { en: normalizedModelEn, ar: normalizedModelAr };
   }
 
-  // Handle Cloudinary image upload (req.files comes from multer-storage-cloudinary)
+  // Handle Cloudinary image upload
   if (req.files && req.files.length > 0) {
-    carData.images = req.files.map((file) => file.path);
+    carData.images = req.files.map((file, index) => ({
+      url: file.path,
+      main: index === 0, // First image is always main
+    }));
+  } else if (carData.images && carData.images.length > 0) {
+    // If images are provided in body, set first as main by default
+    carData.images = carData.images.map((img, index) => ({
+      url: img.url || img, // Handle string or object input
+      main: index === 0, // First image is always main, overrides any provided main flags
+    }));
   }
 
   const car = await Car.create(carData);
@@ -120,9 +139,6 @@ exports.createCar = asyncHandler(async (req, res, next) => {
   res.status(201).json({ success: true, data: car });
 });
 
-// @desc    Update car
-// @route   PUT /api/cars/:id
-// @access  Private
 exports.updateCar = asyncHandler(async (req, res, next) => {
   let car = await Car.findById(req.params.id);
   if (!car) {
@@ -131,74 +147,98 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
 
   const carData = { ...req.body };
 
+  // Handle make/model updates (unchanged)
   if (!isValidObjectId(carData.make)) {
-    const { make: makeName, model } = carData;
-    if (!makeName || !model) {
+    const { make, model } = carData;
+    if (!make?.en || !make?.ar || !model?.en || !model?.ar) {
       return next(new ErrorResponse(messages.make_model_required, 400));
     }
 
-    const normalizedMakeName = makeName.trim().toLowerCase();
-    const normalizedModel = model.trim();
+    const normalizedMakeNameEn = make.en.trim().toLowerCase();
+    const normalizedMakeNameAr = make.ar.trim().toLowerCase();
+    const normalizedModelEn = model.en.trim();
+    const normalizedModelAr = model.ar.trim();
 
-    let make = await Make.findOne({ name: { $regex: new RegExp(`^${normalizedMakeName}$`, 'i') } });
+    let makeDoc = await Make.findOne({
+      'name.en': { $regex: new RegExp(`^${normalizedMakeNameEn}$`, 'i') },
+    });
 
-    if (!make) {
-      make = await Make.create({ name: makeName, models: [normalizedModel] });
-    } else if (!make.models.some((m) => m.toLowerCase() === normalizedModel.toLowerCase())) {
-      make.models.push(normalizedModel);
-      await make.save();
+    if (!makeDoc) {
+      makeDoc = await Make.create({
+        name: { en: make.en, ar: make.ar },
+        models: [{ en: normalizedModelEn, ar: normalizedModelAr }],
+      });
+    } else {
+      const modelExists = makeDoc.models.some(
+        (m) => m.en.toLowerCase() === normalizedModelEn.toLowerCase()
+      );
+      if (!modelExists) {
+        makeDoc.models.push({ en: normalizedModelEn, ar: normalizedModelAr });
+        await makeDoc.save();
+      }
     }
 
-    carData.make = make._id;
+    carData.make = makeDoc._id;
+    carData.model = { en: normalizedModelEn, ar: normalizedModelAr };
   }
 
   // Handle Cloudinary image upload
   if (req.files && req.files.length > 0) {
-    const newImagePaths = req.files.map((file) => file.path);
+    const newImagePaths = req.files.map((file, index) => ({
+      url: file.path,
+      main: index === 0, // First new image is main
+    }));
 
     if (req.body.replaceImages === 'true') {
       // Delete existing images from Cloudinary
-      for (const imageUrl of car.images) {
+      for (const image of car.images) {
         try {
-          const publicId = imageUrl.split('/').pop().split('.')[0];
+          const publicId = image.url.split('/').pop().split('.')[0];
           await cloudinary.uploader.destroy(`Alweam/cars/${publicId}`);
-          console.log(`Deleted image from Cloudinary: ${publicId}`);
         } catch (error) {
           console.error('Failed to delete image from Cloudinary:', error);
         }
       }
       carData.images = newImagePaths;
     } else {
-      carData.images = [...car.images, ...newImagePaths];
+      // Append new images, keeping first of new set as main if no existing main
+      const combinedImages = [...car.images, ...newImagePaths];
+      carData.images = combinedImages.map((img, index) => ({
+        url: img.url,
+        main: index === 0, // First image in combined list is main
+      }));
     }
+  } else if (carData.images && carData.images.length > 0) {
+    // If images are provided in body, set first as main
+    carData.images = carData.images.map((img, index) => ({
+      url: img.url || img, // Handle string or object input
+      main: index === 0, // First image is always main
+    }));
   }
 
-  car = await Car.findByIdAndUpdate(req.params.id, carData, { new: true, runValidators: true });
+  car = await Car.findByIdAndUpdate(req.params.id, carData, {
+    new: true,
+    runValidators: true,
+  });
 
   res.status(200).json({ success: true, data: car });
 });
-
-// @desc    Delete car
-// @route   DELETE /api/cars/:id
-// @access  Private
 exports.deleteCar = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
   if (!car) {
     return next(new ErrorResponse(messages.notFound, 404));
   }
 
-  // Delete images from Cloudinary
   for (const imageUrl of car.images) {
     try {
       const publicId = imageUrl.split('/').pop().split('.')[0];
       await cloudinary.uploader.destroy(`Alweam/cars/${publicId}`);
-      console.log(`Deleted image from Cloudinary: ${publicId}`);
     } catch (error) {
       console.error('Failed to delete image from Cloudinary:', error);
     }
   }
 
-  await Car.deleteOne(car);
+  await Car.deleteOne({ _id: req.params.id });
 
   res.status(200).json({ success: true, message: messages.deleted });
 });

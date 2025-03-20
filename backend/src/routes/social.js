@@ -73,8 +73,7 @@ router.route('/').get(getSocial);
  *   put:
  *     summary: Update social media and contact information
  *     tags: [Social]
- *     security:
- *       - bearerAuth: []
+
  *     requestBody:
  *       required: false
  *       content:

@@ -13,6 +13,16 @@ const HomePageImagesSchema = new mongoose.Schema({
   showroom: {
     type: String,
   },
+  feedback: {
+    type: String,
+  },
+  whatWeDo: {
+    type: String,
+  },
+  terms: {
+    type: String,
+  },
+
   updatedAt: {
     type: Date,
     default: Date.now,
@@ -30,6 +40,12 @@ HomePageImagesSchema.statics.getInstance = async function () {
         'https://res.cloudinary.com/di7sxwjyd/image/upload/v1742476123/Alweam/home/brands_cyxkhn.webp',
       news: 'https://res.cloudinary.com/di7sxwjyd/image/upload/v1742476124/Alweam/home/news_ibiwkx.webp',
       showroom:
+        'https://res.cloudinary.com/di7sxwjyd/image/upload/v1742476124/Alweam/home/contact_tkammi.jpg',
+      feedback:
+        'https://res.cloudinary.com/di7sxwjyd/image/upload/v1742476124/Alweam/home/contact_tkammi.jpg',
+      whatWeDo:
+        'https://res.cloudinary.com/di7sxwjyd/image/upload/v1742476124/Alweam/home/contact_tkammi.jpg',
+      terms:
         'https://res.cloudinary.com/di7sxwjyd/image/upload/v1742476124/Alweam/home/contact_tkammi.jpg',
     });
   }

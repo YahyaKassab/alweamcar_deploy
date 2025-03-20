@@ -1,4 +1,3 @@
-// routes/faq.js
 const express = require('express');
 const { getFAQs, getFAQ, createFAQ, updateFAQ, deleteFAQ } = require('../controllers/FAQ');
 const { protect } = require('../middleware/auth');
@@ -55,7 +54,6 @@ const router = express.Router();
  *                         type: string
  *                         format: date-time
  */
-router.route('/').get(getFAQs);
 
 /**
  * @swagger
@@ -107,7 +105,6 @@ router.route('/').get(getFAQs);
  *       404:
  *         description: FAQ not found
  */
-router.route('/:id').get(getFAQ);
 
 /**
  * @swagger
@@ -115,8 +112,6 @@ router.route('/:id').get(getFAQ);
  *   post:
  *     summary: Create a new FAQ
  *     tags: [FAQs]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -144,21 +139,33 @@ router.route('/:id').get(getFAQ);
  *                 required:
  *                   - en
  *                   - ar
+ *             required:
+ *               - question
+ *               - answer
  *     responses:
  *       201:
  *         description: FAQ created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/FAQ'
  *       400:
  *         description: Validation error
+ *       401:
+ *         description: Not authorized
  */
-router.route('/').post(protect, createFAQ);
+
 /**
  * @swagger
  * /api/faqs/{id}:
  *   put:
  *     summary: Update an FAQ
  *     tags: [FAQs]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -190,31 +197,55 @@ router.route('/').post(protect, createFAQ);
  *     responses:
  *       200:
  *         description: FAQ updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/FAQ'
  *       400:
  *         description: Invalid ID format or validation error
+ *       401:
+ *         description: Not authorized
  *       404:
  *         description: FAQ not found
  */
-router.route('/:id').put(protect, updateFAQ);
+
 /**
  * @swagger
  * /api/faqs/{id}:
  *   delete:
- *     summary: Delete a faqs item
- *     tags: [Faqs]
+ *     summary: Delete an FAQ item
+ *     tags: [FAQs]  # Fixed typo from "Faqs" to "FAQs"
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: faqs ID
+ *         description: FAQ ID
  *     responses:
  *       200:
- *         description: faqs item deleted successfully
+ *         description: FAQ item deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Not authorized
  *       404:
- *         description: faqs not found
+ *         description: FAQ not found
  */
-router.route('/:id').delete(protect, deleteFAQ);
+
+router.route('/').get(getFAQs).post(protect, createFAQ);
+router.route('/:id').get(getFAQ).put(protect, updateFAQ).delete(protect, deleteFAQ);
 
 module.exports = router;

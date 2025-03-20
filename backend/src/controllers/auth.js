@@ -10,21 +10,21 @@ const { default: mongoose } = require('mongoose');
 // @route   POST /api/auth/forgot-password
 // @access  Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
-    const admin = await Admin.findOne({ email: req.body.email });
+  const admin = await Admin.findOne({ email: req.body.email });
 
-    if (!admin) {
-        return next(new ErrorResponse(messages.admin_not_found, 404));
-    }
+  if (!admin) {
+    return next(new ErrorResponse(messages.admin_not_found, 404));
+  }
 
-    // Get reset token
-    const resetToken = admin.getResetPasswordToken();
+  // Get reset token
+  const resetToken = admin.getResetPasswordToken();
 
-    await admin.save({ validateBeforeSave: false });
+  await admin.save({ validateBeforeSave: false });
 
-    // Create reset URL
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${resetToken}`;
+  // Create reset URL
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${resetToken}`;
 
-    const getPasswordResetEmail = (resetUrl) => `
+  const getPasswordResetEmail = (resetUrl) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,136 +101,153 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 </html>
 `;
 
-    try {
-        await sendEmail({
-            email: admin.email,
-            subject: messages.reset_password_subject,
-            html: getPasswordResetEmail(resetUrl),
-        });
+  try {
+    await sendEmail({
+      email: admin.email,
+      subject: messages.reset_password_subject,
+      html: getPasswordResetEmail(resetUrl),
+    });
 
-        res.status(200).json({
-            success: true,
-            message: messages.email_sent,
-        });
-    } catch (error) {
-        admin.resetPasswordToken = undefined;
-        admin.resetPasswordExpire = undefined;
-        await admin.save({ validateBeforeSave: false });
+    res.status(200).json({
+      success: true,
+      message: messages.email_sent,
+    });
+  } catch (error) {
+    admin.resetPasswordToken = undefined;
+    admin.resetPasswordExpire = undefined;
+    await admin.save({ validateBeforeSave: false });
 
-        return next(new ErrorResponse(messages.email_failed, 500));
-    }
+    return next(new ErrorResponse(messages.email_failed, 500));
+  }
 });
 
 // @desc    Reset password
 // @route   PUT /api/auth/reset-password/:resetToken
 // @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
-    const resetPasswordToken = crypto
-        .createHash('sha256')
-        .update(req.params.resetToken)
-        .digest('hex');
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.resetToken)
+    .digest('hex');
 
-    const admin = await Admin.findOne({
-        resetPasswordToken,
-        resetPasswordExpire: { $gt: Date.now() },
-    });
+  const admin = await Admin.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
 
-    if (!admin) {
-        return next(new ErrorResponse(messages.invalid_reset_token, 400));
-    }
+  if (!admin) {
+    return next(new ErrorResponse(messages.invalid_reset_token, 400));
+  }
 
-    // Set new password
-    admin.password = req.body.password;
-    admin.resetPasswordToken = undefined;
-    admin.resetPasswordExpire = undefined;
-    await admin.save();
+  // Set new password
+  admin.password = req.body.password;
+  admin.resetPasswordToken = undefined;
+  admin.resetPasswordExpire = undefined;
+  await admin.save();
 
-    sendTokenResponse(admin, 200, res);
-});
-
-// @desc    Register admin
-// @route   POST /api/auth/register
-// @access  Public
-exports.register = asyncHandler(async (req, res, next) => {
-    const { name, email, password, mobile } = req.body;
-
-    // Create admin
-    const admin = await Admin.create({
-        name,
-        email,
-        password,
-        mobile,
-    });
-
-    sendTokenResponse(admin, 201, res);
+  sendTokenResponse(admin, 200, res);
 });
 
 // @desc    Login admin
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = asyncHandler(async (req, res, next) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // Validate email & password
-    if (!email || !password) {
-        return next(new ErrorResponse(messages.provide_email_password, 400));
-    }
+  // Validate email & password
+  if (!email || !password) {
+    return next(new ErrorResponse(messages.provide_email_password, 400));
+  }
 
-    // Check for admin
-    const admin = await Admin.findOne({ email }).select('+password');
+  // Check for admin
+  const admin = await Admin.findOne({ email }).select('+password');
 
-    if (!admin) {
-        return next(new ErrorResponse(messages.invalid_credentials, 401));
-    }
+  if (!admin) {
+    return next(new ErrorResponse(messages.invalid_credentials, 401));
+  }
 
-    // Check if password matches
-    const isMatch = await admin.matchPassword(password);
+  // Check if password matches
+  const isMatch = await admin.matchPassword(password);
 
-    if (!isMatch) {
-        return next(new ErrorResponse(messages.invalid_credentials, 401));
-    }
+  if (!isMatch) {
+    return next(new ErrorResponse(messages.invalid_credentials, 401));
+  }
 
-    sendTokenResponse(admin, 200, res);
+  sendTokenResponse(admin, 200, res);
 });
 
 // @desc    Get current logged in admin
 // @route   GET /api/auth/me
 // @access  Private
 exports.getMe = asyncHandler(async (req, res, next) => {
-    const admin = await Admin.findById(req.admin.id);
+  const admin = await Admin.findById(req.admin.id);
 
-    res.status(200).json({
-        success: true,
-        data: admin,
-    });
+  res.status(200).json({
+    success: true,
+    data: admin,
+  });
 });
 
 // @desc    Log admin out / clear cookie
 // @route   GET /api/auth/logout
 // @access  Private
 exports.logout = asyncHandler(async (req, res, next) => {
-    res.status(200).json({
-        success: true,
-        data: {},
-    });
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
+});
+
+// @desc    Change password
+// @route   PUT /api/auth/change-password
+// @access  Private
+exports.changePassword = asyncHandler(async (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
+
+  // Validate input
+  if (!oldPassword || !newPassword) {
+    return next(new ErrorResponse(messages.provide_old_new_password, 400));
+  }
+
+  // Find the admin and select password field
+  const admin = await Admin.findById(req.admin.id).select('+password');
+
+  if (!admin) {
+    return next(new ErrorResponse(messages.admin_not_found, 404));
+  }
+
+  // Verify old password
+  const isMatch = await admin.matchPassword(oldPassword);
+  if (!isMatch) {
+    return next(new ErrorResponse(messages.invalid_old_password, 401));
+  }
+
+  // Set new password
+  admin.password = newPassword;
+  await admin.save();
+
+  res.status(200).json({
+    success: true,
+    message: messages.password_changed,
+  });
 });
 
 // Helper function to get token from model, create cookie and send response
 const sendTokenResponse = (admin, statusCode, res) => {
-    // Create token
-    const token = admin.getSignedJwtToken();
+  // Create token
+  const token = admin.getSignedJwtToken();
 
-    const options = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-    };
+  const options = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
 
-    if (process.env.NODE_ENV === 'production') {
-        options.secure = true;
-    }
+  if (process.env.NODE_ENV === 'production') {
+    options.secure = true;
+  }
 
-    res.status(statusCode).json({
-        success: true,
-        token,
-    });
+  res.status(statusCode).json({
+    success: true,
+    token,
+  });
 };

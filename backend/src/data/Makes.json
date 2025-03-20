@@ -1,63 +1,197 @@
 [
-    {
-      "name": "Toyota",
-      "models": ["Camry", "Corolla", "RAV4", "Highlander", "Tacoma"]
+  {
+    "name": {
+      "en": "Toyota",
+      "ar": "تويوتا"
     },
-    {
-      "name": "Honda",
-      "models": ["Civic", "Accord", "CR-V", "Pilot", "Fit"]
+    "models": [
+      { "en": "Camry", "ar": "كامري" },
+      { "en": "Corolla", "ar": "كورولا" },
+      { "en": "RAV4", "ar": "راف فور" },
+      { "en": "Highlander", "ar": "هايلاندر" },
+      { "en": "Tacoma", "ar": "تاكوما" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Honda",
+      "ar": "هوندا"
     },
-    {
-      "name": "Ford",
-      "models": ["F-150", "Mustang", "Explorer", "Escape", "Bronco"]
+    "models": [
+      { "en": "Civic", "ar": "سيفيك" },
+      { "en": "Accord", "ar": "أكورد" },
+      { "en": "CR-V", "ar": "سي آر-في" },
+      { "en": "Pilot", "ar": "بايلوت" },
+      { "en": "Fit", "ar": "فيت" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Ford",
+      "ar": "فورد"
     },
-    {
-      "name": "Chevrolet",
-      "models": ["Silverado", "Malibu", "Equinox", "Tahoe", "Camaro"]
+    "models": [
+      { "en": "F-150", "ar": "إف-150" },
+      { "en": "Mustang", "ar": "موستنج" },
+      { "en": "Explorer", "ar": "إكسبلورر" },
+      { "en": "Escape", "ar": "إسكيب" },
+      { "en": "Bronco", "ar": "برونكو" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Chevrolet",
+      "ar": "شيفروليه"
     },
-    {
-      "name": "BMW",
-      "models": ["3 Series", "5 Series", "X5", "X3", "M4"]
+    "models": [
+      { "en": "Silverado", "ar": "سيلفرادو" },
+      { "en": "Malibu", "ar": "ماليبو" },
+      { "en": "Equinox", "ar": "إكوينوكس" },
+      { "en": "Tahoe", "ar": "تاهو" },
+      { "en": "Camaro", "ar": "كامارو" }
+    ]
+  },
+  {
+    "name": {
+      "en": "BMW",
+      "ar": "بي إم دبليو"
     },
-    {
-      "name": "Mercedes-Benz",
-      "models": ["C-Class", "E-Class", "S-Class", "GLC", "GLE"]
+    "models": [
+      { "en": "3 Series", "ar": "سلسلة 3" },
+      { "en": "5 Series", "ar": "سلسلة 5" },
+      { "en": "X5", "ar": "إكس 5" },
+      { "en": "X3", "ar": "إكس 3" },
+      { "en": "M4", "ar": "إم 4" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Mercedes-Benz",
+      "ar": "مرسيدس-بنز"
     },
-    {
-      "name": "Audi",
-      "models": ["A4", "A6", "Q5", "Q7", "RS5"]
+    "models": [
+      { "en": "C-Class", "ar": "الفئة سي" },
+      { "en": "E-Class", "ar": "الفئة إي" },
+      { "en": "S-Class", "ar": "الفئة إس" },
+      { "en": "GLC", "ar": "جي إل سي" },
+      { "en": "GLE", "ar": "جي إل إي" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Audi",
+      "ar": "أودي"
     },
-    {
-      "name": "Nissan",
-      "models": ["Altima", "Sentra", "Rogue", "Murano", "GT-R"]
+    "models": [
+      { "en": "A4", "ar": "إيه 4" },
+      { "en": "A6", "ar": "إيه 6" },
+      { "en": "Q5", "ar": "كيو 5" },
+      { "en": "Q7", "ar": "كيو 7" },
+      { "en": "RS5", "ar": "آر إس 5" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Nissan",
+      "ar": "نيسان"
     },
-    {
-      "name": "Hyundai",
-      "models": ["Elantra", "Sonata", "Tucson", "Santa Fe", "Kona"]
+    "models": [
+      { "en": "Altima", "ar": "ألتيما" },
+      { "en": "Sentra", "ar": "سنترا" },
+      { "en": "Rogue", "ar": "روج" },
+      { "en": "Murano", "ar": "مورانو" },
+      { "en": "GT-R", "ar": "جي تي-آر" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Hyundai",
+      "ar": "هيونداي"
     },
-    {
-      "name": "Tesla",
-      "models": ["Model S", "Model 3", "Model X", "Model Y", "Cybertruck"]
+    "models": [
+      { "en": "Elantra", "ar": "إلنترا" },
+      { "en": "Sonata", "ar": "سوناتا" },
+      { "en": "Tucson", "ar": "توسان" },
+      { "en": "Santa Fe", "ar": "سانتا في" },
+      { "en": "Kona", "ar": "كونا" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Tesla",
+      "ar": "تسلا"
     },
-    {
-      "name": "Volkswagen",
-      "models": ["Golf", "Jetta", "Passat", "Tiguan", "Atlas"]
+    "models": [
+      { "en": "Model S", "ar": "موديل إس" },
+      { "en": "Model 3", "ar": "موديل 3" },
+      { "en": "Model X", "ar": "موديل إكس" },
+      { "en": "Model Y", "ar": "موديل واي" },
+      { "en": "Cybertruck", "ar": "سايبرتراك" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Volkswagen",
+      "ar": "فولكس واجن"
     },
-    {
-      "name": "Subaru",
-      "models": ["Outback", "Forester", "Crosstrek", "Impreza", "WRX"]
+    "models": [
+      { "en": "Golf", "ar": "جولف" },
+      { "en": "Jetta", "ar": "جيتا" },
+      { "en": "Passat", "ar": "باسات" },
+      { "en": "Tiguan", "ar": "تيجوان" },
+      { "en": "Atlas", "ar": "أطلس" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Subaru",
+      "ar": "سوبارو"
     },
-    {
-      "name": "Lexus",
-      "models": ["RX", "ES", "NX", "IS", "GX"]
+    "models": [
+      { "en": "Outback", "ar": "أوتباك" },
+      { "en": "Forester", "ar": "فورستر" },
+      { "en": "Crosstrek", "ar": "كروسسترك" },
+      { "en": "Impreza", "ar": "إمبريزا" },
+      { "en": "WRX", "ar": "دبليو آر إكس" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Lexus",
+      "ar": "لكزس"
     },
-    {
-      "name": "Mazda",
-      "models": ["Mazda3", "Mazda6", "CX-5", "CX-30", "MX-5 Miata"]
+    "models": [
+      { "en": "RX", "ar": "آر إكس" },
+      { "en": "ES", "ar": "إي إس" },
+      { "en": "NX", "ar": "إن إكس" },
+      { "en": "IS", "ar": "آي إس" },
+      { "en": "GX", "ar": "جي إكس" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Mazda",
+      "ar": "مازدا"
     },
-    {
-      "name": "Jeep",
-      "models": ["Wrangler", "Grand Cherokee", "Cherokee", "Renegade", "Gladiator"]
-    }
-  ]
-  
+    "models": [
+      { "en": "Mazda3", "ar": "مازدا 3" },
+      { "en": "Mazda6", "ar": "مازدا 6" },
+      { "en": "CX-5", "ar": "سي إكس-5" },
+      { "en": "CX-30", "ar": "سي إكس-30" },
+      { "en": "MX-5 Miata", "ar": "إم إكس-5 مياتا" }
+    ]
+  },
+  {
+    "name": {
+      "en": "Jeep",
+      "ar": "جيب"
+    },
+    "models": [
+      { "en": "Wrangler", "ar": "رانجلر" },
+      { "en": "Grand Cherokee", "ar": "جراند شيروكي" },
+      { "en": "Cherokee", "ar": "شيروكي" },
+      { "en": "Renegade", "ar": "رينيجيد" },
+      { "en": "Gladiator", "ar": "جلادياتور" }
+    ]
+  }
+]

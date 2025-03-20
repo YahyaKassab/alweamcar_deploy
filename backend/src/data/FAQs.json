@@ -1,0 +1,35 @@
+[
+  {
+    "question": {
+      "en": "What is the return policy?",
+      "ar": "ما هي سياسة الإرجاع؟"
+    },
+    "answer": {
+      "en": "You can return any product within 30 days of purchase with the original receipt.",
+      "ar": "يمكنك إرجاع أي منتج خلال 30 يومًا من الشراء مع الإيصال الأصلي."
+    },
+    "createdAt": "2025-03-20T12:00:00Z"
+  },
+  {
+    "question": {
+      "en": "How can I reset my password?",
+      "ar": "كيف يمكنني إعادة تعيين كلمة المرور؟"
+    },
+    "answer": {
+      "en": "Go to the login page and click 'Forgot Password' to receive a reset link.",
+      "ar": "انتقل إلى صفحة تسجيل الدخول وانقر على 'نسيت كلمة المرور' لاستلام رابط إعادة التعيين."
+    },
+    "createdAt": "2025-03-19T15:30:00Z"
+  },
+  {
+    "question": {
+      "en": "Do you offer international shipping?",
+      "ar": "هل تقدمون الشحن الدولي؟"
+    },
+    "answer": {
+      "en": "Yes, we ship to over 50 countries worldwide. Shipping fees apply.",
+      "ar": "نعم، نقوم بالشحن إلى أكثر من 50 دولة حول العالم. تُطبق رسوم الشحن."
+    },
+    "createdAt": "2025-03-18T08:45:00Z"
+  }
+]

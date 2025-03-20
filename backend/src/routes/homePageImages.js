@@ -57,8 +57,7 @@ router.route('/').get(getHomePageImages);
  *   put:
  *     summary: Update home page images
  *     tags: [HomePageImages]
- *     security:
- *       - bearerAuth: []
+
  *     requestBody:
  *       required: false
  *       content:

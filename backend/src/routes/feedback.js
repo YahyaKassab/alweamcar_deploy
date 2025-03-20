@@ -1,9 +1,9 @@
 const express = require('express');
 const {
-    getFeedbacks,
-    getFeedback,
-    createFeedback,
-    deleteFeedback,
+  getFeedbacks,
+  getFeedback,
+  createFeedback,
+  deleteFeedback,
 } = require('../controllers/feedback');
 const { protect } = require('../middleware/auth');
 
@@ -13,6 +13,7 @@ const router = express.Router();
  * /api/feedback:
  *   get:
  *     summary: Get all feedbacks
+ *     tags: [Feedbacks]
  *     description: Retrieve a list of feedbacks (protected route)
  *     responses:
  *       200:
@@ -81,6 +82,8 @@ router.route('/').get(protect, getFeedbacks).post(createFeedback);
  * /api/feedback/{id}:
  *   get:
  *     summary: Get a single feedback
+ *     tags: [Feedbacks]
+ *
  *     description: Retrieve a specific feedback by ID (protected route)
  *     parameters:
  *       - in: path
