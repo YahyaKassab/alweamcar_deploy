@@ -1,0 +1,39 @@
+Install Mongodb:
+https://www.mongodb.com/try/download/community
+
+https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-8.0.5-signed.msi
+
+Environment:
+System => Path
+C:\Program Files\MongoDB\Server\8.0\bin
+
+Install Mongosh:
+https://downloads.mongodb.com/compass/mongosh-2.4.2-x64.msi
+
+CMD:
+mongod --version
+
+
+
+
+
+
+
+
+
+SEED ALL OF THIS
+
+DONE	
+filter by make, Id
+Images of home page[what we do, brands, news, showroom]
+Social Item: mobile, insta, tiktok, youtube, snapchat, location, email, whatsapp number, sales numbers[]
+add arabic in everything #ask
+1 image is main
+add partners
+news latest
+Feedback pic
+What we do pic
+terms pic
+FAQs ar en #delete not showing up
+news: details, brave #ask
+Edit Password
