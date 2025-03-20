@@ -53,6 +53,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         p {
             font-size: 18px;
             line-height: 1.6;
+            color:white;
         }
         .button {
             display: inline-block;
