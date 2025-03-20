@@ -10,27 +10,29 @@ const cloudinary = require('cloudinary').v2;
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-// @desc    Get all cars with pagination and filtering
-// @route   GET /api/cars
-// @access  Public
 exports.getCars = asyncHandler(async (req, res) => {
   const { make, model, year, condition, page = 1, limit = 10 } = req.query;
-  
+
   const query = {};
-  if (make) query.make = make;
+  // If searching by make name instead of ID
+  if (make) {
+    const makeDoc = await Make.findOne({ name: make });
+    if (makeDoc) query.make = makeDoc._id;
+  }
   if (model) query.model = model;
   if (year) query.year = year;
   if (condition) query.condition = condition;
 
   const skip = (page - 1) * limit;
-  
+
   const total = await Car.countDocuments(query);
   const cars = await Car.find(query)
+    .populate('make', 'make')
     .skip(skip)
     .limit(parseInt(limit, 10))
     .sort('-createdAt');
@@ -42,21 +44,20 @@ exports.getCars = asyncHandler(async (req, res) => {
     pagination: {
       currentPage: parseInt(page, 10),
       totalPages: Math.ceil(total / limit),
-      pageSize: parseInt(limit, 10)
+      pageSize: parseInt(limit, 10),
     },
-    data: cars
+    data: cars,
   });
 });
-
 // @desc    Get single car
 // @route   GET /api/cars/:id
 // @access  Public
 exports.getCar = asyncHandler(async (req, res, next) => {
-  const car = await Car.findById(req.params.id).populate('make','name');
+  const car = await Car.findById(req.params.id).populate('make', 'name');
   if (!car) {
     return next(new ErrorResponse(messages.notFound, 404));
   }
-  
+
   res.status(200).json({ success: true, data: car });
 });
 
@@ -68,9 +69,9 @@ exports.getSimilarCars = asyncHandler(async (req, res, next) => {
   if (!car) {
     return next(new ErrorResponse(messages.notFound, 404));
   }
-  
+
   const similarCars = await Car.find({ make: car.make, _id: { $ne: car._id } }).limit(6);
-  
+
   res.status(200).json({ success: true, count: similarCars.length, data: similarCars });
 });
 
@@ -78,7 +79,7 @@ exports.getSimilarCars = asyncHandler(async (req, res, next) => {
 // @route   GET /api/cars/makes
 // @access  Public
 exports.getMakes = asyncHandler(async (req, res) => {
-  const makes = await Make.find({},'name models');
+  const makes = await Make.find({}, 'name models');
   res.status(200).json({ success: true, count: makes.length, data: makes });
 });
 
@@ -101,7 +102,7 @@ exports.createCar = asyncHandler(async (req, res, next) => {
 
     if (!make) {
       make = await Make.create({ name: makeName, models: [normalizedModel] });
-    } else if (!make.models.some(m => m.toLowerCase() === normalizedModel.toLowerCase())) {
+    } else if (!make.models.some((m) => m.toLowerCase() === normalizedModel.toLowerCase())) {
       make.models.push(normalizedModel);
       await make.save();
     }
@@ -111,12 +112,12 @@ exports.createCar = asyncHandler(async (req, res, next) => {
 
   // Handle Cloudinary image upload (req.files comes from multer-storage-cloudinary)
   if (req.files && req.files.length > 0) {
-    carData.images = req.files.map(file => file.path);
+    carData.images = req.files.map((file) => file.path);
   }
 
   const car = await Car.create(carData);
-  
-  res.status(201).json({ success: true, data: car});
+
+  res.status(201).json({ success: true, data: car });
 });
 
 // @desc    Update car
@@ -143,7 +144,7 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
 
     if (!make) {
       make = await Make.create({ name: makeName, models: [normalizedModel] });
-    } else if (!make.models.some(m => m.toLowerCase() === normalizedModel.toLowerCase())) {
+    } else if (!make.models.some((m) => m.toLowerCase() === normalizedModel.toLowerCase())) {
       make.models.push(normalizedModel);
       await make.save();
     }
@@ -153,7 +154,7 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
 
   // Handle Cloudinary image upload
   if (req.files && req.files.length > 0) {
-    const newImagePaths = req.files.map(file => file.path);
+    const newImagePaths = req.files.map((file) => file.path);
 
     if (req.body.replaceImages === 'true') {
       // Delete existing images from Cloudinary
