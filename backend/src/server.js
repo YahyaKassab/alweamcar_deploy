@@ -40,6 +40,7 @@ const termsRoutes = require('./routes/Terms');
 const homeImagesRoutes = require('./routes/homePageImages');
 const socialRoutes = require('./routes/social');
 const faqRoutes = require('./routes/FAQ');
+const partnerRoutes = require('./routes/partners');
 
 const app = express();
 app.use(limiter);
@@ -87,6 +88,7 @@ app.use('/api/terms', termsRoutes);
 app.use('/api/home-page-images', homeImagesRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/faqs', faqRoutes);
+app.use('/api/partners', partnerRoutes);
 
 // app.get('/send-test-email', async (req, res) => {
 //     try {

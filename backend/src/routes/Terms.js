@@ -3,7 +3,6 @@ const { getTermsAndConditions , updateTermsAndConditions } = require('../control
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
-
 /**
  * @swagger
  * /api/terms:
@@ -26,14 +25,31 @@ const router = express.Router();
  *                   type: object
  *                   properties:
  *                     content:
- *                       type: object
- *                       properties:
- *                         en:
- *                           type: string
- *                           example: "Our mission is to provide..."
- *                         ar:
- *                           type: string
- *                           example: "مهمتنا هي تقديم..."
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           title:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Terms & Conditions"
+ *                               ar:
+ *                                 type: string
+ *                                 example: "الشروط والأحكام"
+ *                           details:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Our mission is to provide the best services..."
+ *                               ar:
+ *                                 type: string
+ *                                 example: "مهمتنا هي تقديم أفضل الخدمات..."
+ *                           order:
+ *                             type: number
+ *                             example: 1
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
@@ -49,14 +65,31 @@ const router = express.Router();
  *             type: object
  *             properties:
  *               content:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     example: "Updated content in English."
- *                   ar:
- *                     type: string
- *                     example: "المحتوى المحدث باللغة العربية."
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                           example: "Updated Terms & Conditions"
+ *                         ar:
+ *                           type: string
+ *                           example: "الشروط والأحكام المحدثة"
+ *                     details:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                           example: "Updated details about our terms..."
+ *                         ar:
+ *                           type: string
+ *                           example: "تفاصيل محدثة حول الشروط..."
+ *                     order:
+ *                       type: number
+ *                       example: 2
  *     responses:
  *       200:
  *         description: Successfully updated content
@@ -72,14 +105,31 @@ const router = express.Router();
  *                   type: object
  *                   properties:
  *                     content:
- *                       type: object
- *                       properties:
- *                         en:
- *                           type: string
- *                           example: "Updated English content."
- *                         ar:
- *                           type: string
- *                           example: "تم تحديث المحتوى العربي."
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           title:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Updated Terms & Conditions"
+ *                               ar:
+ *                                 type: string
+ *                                 example: "الشروط والأحكام المحدثة"
+ *                           details:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Updated details about our terms..."
+ *                               ar:
+ *                                 type: string
+ *                                 example: "تفاصيل محدثة حول الشروط..."
+ *                           order:
+ *                             type: number
+ *                             example: 2
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
@@ -88,6 +138,7 @@ const router = express.Router();
  *       400:
  *         description: Bad request, validation error
  */
+
 router.route('/').get(getTermsAndConditions).put(protect, updateTermsAndConditions);
 
 module.exports = router;

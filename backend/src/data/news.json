@@ -1,41 +1,98 @@
-
 [
-    {
-      "title": {
-        "en": "New Electric Car Model Launched",
-        "ar": "إطلاق طراز جديد من السيارات الكهربائية"
+  {
+    "content": [
+      {
+        "title": {
+          "en": "New Electric Car Model Launched",
+          "ar": "إطلاق طراز جديد من السيارات الكهربائية"
+        },
+        "details": {
+          "en": "A leading car manufacturer has introduced a new electric vehicle with advanced features and an extended battery range.",
+          "ar": "قامت شركة تصنيع سيارات رائدة بإطلاق سيارة كهربائية جديدة بمواصفات متقدمة ومدى بطارية ممتد."
+        }
       },
-      "details": {
-        "en": "A leading car manufacturer has introduced a new electric vehicle with advanced features and an extended battery range.",
-        "ar": "قامت شركة تصنيع سيارات رائدة بإطلاق سيارة كهربائية جديدة بمواصفات متقدمة ومدى بطارية ممتد."
-      },
-      "date": "2024-03-01T08:30:00Z",
-      "image": "1.jpg"
+      {
+        "title": {
+          "en": "Innovative Battery Technology Unveiled",
+          "ar": "الكشف عن تقنية بطارية مبتكرة"
+        },
+        "details": {
+          "en": "The new model features a breakthrough battery that charges in under 30 minutes.",
+          "ar": "يتميز الطراز الجديد ببطارية متطورة تشحن في أقل من 30 دقيقة."
+        }
+      }
+    ],
+    "brave": {
+      "en": "Driving the Future of Mobility",
+      "ar": "قيادة مستقبل التنقل"
     },
-    {
-      "title": {
-        "en": "Automotive Industry Faces Supply Chain Challenges",
-        "ar": "صناعة السيارات تواجه تحديات في سلسلة التوريد"
+    "image": "1.jpg",
+    "date": "2024-03-01T08:30:00Z",
+    "createdAt": "2024-03-01T08:30:00Z",
+    "updatedAt": "2024-03-01T08:30:00Z"
+  },
+  {
+    "content": [
+      {
+        "title": {
+          "en": "Automotive Industry Faces Supply Chain Challenges",
+          "ar": "صناعة السيارات تواجه تحديات في سلسلة التوريد"
+        },
+        "details": {
+          "en": "Due to ongoing global supply chain issues, the automotive sector is experiencing delays in production.",
+          "ar": "بسبب مشاكل سلسلة التوريد العالمية المستمرة، يواجه قطاع السيارات تأخيرات في الإنتاج."
+        }
       },
-      "details": {
-        "en": "Due to ongoing global supply chain issues, the automotive sector is experiencing delays in production.",
-        "ar": "بسبب مشاكل سلسلة التوريد العالمية المستمرة، يواجه قطاع السيارات تأخيرات في الإنتاج."
-      },
-      "date": "2024-03-05T12:00:00Z",
-      "image": "3.jpg"
+      {
+        "title": {
+          "en": "Chip Shortage Impacts Production",
+          "ar": "نقص الرقائق يؤثر على الإنتاج"
+        },
+        "details": {
+          "en": "A shortage of semiconductor chips is causing significant disruptions across factories.",
+          "ar": "نقص في رقائق أشباه الموصلات يسبب اضطرابات كبيرة في المصانع."
+        }
+      }
+    ],
+    "brave": {
+      "en": "Navigating Industry Challenges",
+      "ar": "التغلب على تحديات الصناعة"
     },
-    {
-      "title": {
-        "en": "New Traffic Laws Implemented",
-        "ar": "تطبيق قوانين مرور جديدة"
+    "image": "3.jpg",
+    "date": "2024-03-05T12:00:00Z",
+    "createdAt": "2024-03-05T12:00:00Z",
+    "updatedAt": "2024-03-05T12:00:00Z"
+  },
+  {
+    "content": [
+      {
+        "title": {
+          "en": "New Traffic Laws Implemented",
+          "ar": "تطبيق قوانين مرور جديدة"
+        },
+        "details": {
+          "en": "The government has announced new traffic regulations aimed at reducing road accidents.",
+          "ar": "أعلنت الحكومة عن قوانين مرورية جديدة تهدف إلى تقليل حوادث الطرق."
+        }
       },
-      "details": {
-        "en": "The government has announced new traffic regulations aimed at reducing road accidents.",
-        "ar": "أعلنت الحكومة عن قوانين مرورية جديدة تهدف إلى تقليل حوادث الطرق."
-      },
-      "date": "2024-03-10T09:45:00Z",
-      "image": "2.jpg"
-    }
-  ]
-  
-  
+      {
+        "title": {
+          "en": "Stricter Penalties for Violations",
+          "ar": "عقوبات أشد للمخالفات"
+        },
+        "details": {
+          "en": "Fines and penalties for traffic violations have been increased to enforce compliance.",
+          "ar": "تم زيادة الغرامات والعقوبات على المخالفات المرورية لفرض الامتثال."
+        }
+      }
+    ],
+    "brave": {
+      "en": "Safer Roads Ahead",
+      "ar": "طرق أكثر أمانًا في المستقبل"
+    },
+    "image": "2.jpg",
+    "date": "2024-03-10T09:45:00Z",
+    "createdAt": "2024-03-10T09:45:00Z",
+    "updatedAt": "2024-03-10T09:45:00Z"
+  }
+]

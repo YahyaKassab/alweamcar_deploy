@@ -1,0 +1,23 @@
+[
+  {
+    "name": "TechCorp",
+    "url": "https://www.techcorp.com",
+    "image": "1.jpg",
+    "createdAt": "2025-03-20T10:00:00Z",
+    "updatedAt": "2025-03-20T10:00:00Z"
+  },
+  {
+    "name": "GreenEnergy Solutions",
+    "url": "https://www.greenenergy.com",
+    "image": "",
+    "createdAt": "2025-03-19T14:30:00Z",
+    "updatedAt": "2025-03-19T14:30:00Z"
+  },
+  {
+    "name": "EduLearn",
+    "url": "https://www.edulearn.org",
+    "image": "2.jpg",
+    "createdAt": "2025-03-18T09:15:00Z",
+    "updatedAt": "2025-03-18T09:15:00Z"
+  }
+]

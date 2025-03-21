@@ -34,6 +34,7 @@ const router = express.Router();
  *         description: List of all news with pagination
  */
 router.route('/').get(getAllNews);
+
 /**
  * @swagger
  * /api/news:
@@ -53,23 +54,28 @@ router.route('/').get(getAllNews);
  *               title_ar:
  *                 type: string
  *                 description: News title in Arabic
- *               image:
- *                 type: string
- *                 format: binary
- *                 description: News image file
  *               details_en:
  *                 type: string
  *                 description: News details in English
  *               details_ar:
  *                 type: string
  *                 description: News details in Arabic
+ *               brave_en:
+ *                 type: string
+ *                 description: Brave text in English
+ *               brave_ar:
+ *                 type: string
+ *                 description: Brave text in Arabic
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: News image file
  *     responses:
  *       201:
  *         description: News item created successfully
  *       400:
  *         description: Validation error
  */
-
 router.route('/').post(protect, uploadNews.single('image'), createNews);
 
 /**
@@ -107,7 +113,6 @@ router.route('/:id').get(getNews);
  *           type: string
  *         description: News ID
  *     requestBody:
- *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -119,16 +124,22 @@ router.route('/:id').get(getNews);
  *               title_ar:
  *                 type: string
  *                 description: Updated news title in Arabic
+ *               details_en:
+ *                 type: string
+ *                 description: Updated news details in English
+ *               details_ar:
+ *                 type: string
+ *                 description: Updated news details in Arabic
+ *               brave_en:
+ *                 type: string
+ *                 description: Updated brave text in English
+ *               brave_ar:
+ *                 type: string
+ *                 description: Updated brave text in Arabic
  *               image:
  *                 type: string
  *                 format: binary
  *                 description: Updated news image
- *               details_en:
- *                 type: string
- *                 description: Updated news details in English (Markdown format)
- *               details_ar:
- *                 type: string
- *                 description: Updated news details in Arabic (Markdown format)
  *     responses:
  *       200:
  *         description: News item updated successfully

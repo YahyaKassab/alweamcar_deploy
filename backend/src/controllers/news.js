@@ -1,16 +1,49 @@
+const fs = require('fs');
+const path = require('path');
+const sharp = require('sharp');
 const News = require('../models/News');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const messages = require('../locales/messages');
 const { default: mongoose } = require('mongoose');
-const cloudinary = require('cloudinary').v2;
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Set image directory
+const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'uploads');
+const imagesDestDirNews = path.join(uploadsBaseDir, 'news');
+
+// Ensure news directory exists
+const ensureDirectory = () => {
+  if (!fs.existsSync(imagesDestDirNews)) {
+    fs.mkdirSync(imagesDestDirNews, { recursive: true });
+  }
+};
+
+// Utility to validate and resize image
+const processImage = async (file) => {
+  const fileSizeInMB = file.size / (1024 * 1024);
+  const destPath = path.join(imagesDestDirNews, file.filename);
+
+  if (fileSizeInMB > 1) {
+    const resizedBuffer = await sharp(file.path)
+      .resize({ width: 1200, withoutEnlargement: true })
+      .jpeg({ quality: 80 })
+      .toBuffer();
+
+    const resizedSizeInMB = resizedBuffer.length / (1024 * 1024);
+    if (resizedSizeInMB > 1) {
+      throw new Error(
+        `Image ${file.filename} could not be resized below 1MB (${resizedSizeInMB.toFixed(2)}MB)`
+      );
+    }
+
+    fs.writeFileSync(destPath, resizedBuffer);
+    fs.unlinkSync(file.path); // Remove temp file
+  } else {
+    fs.renameSync(file.path, destPath);
+  }
+
+  return `/uploads/news/${file.filename}`;
+};
 
 // @desc    Get all news with pagination
 // @route   GET /api/news
@@ -61,25 +94,30 @@ exports.getNews = asyncHandler(async (req, res, next) => {
 // @route   POST /api/news
 // @access  Private
 exports.createNews = asyncHandler(async (req, res, next) => {
+  ensureDirectory();
+
   if (req.file) {
-    // Cloudinary now handles the file, and multer-storage-cloudinary adds the URL to req.file
-    req.body.image = req.file.path;
+    try {
+      req.body.image = await processImage(req.file);
+    } catch (error) {
+      return next(new ErrorResponse(error.message, 400));
+    }
   }
 
-  const { title_en, title_ar, details_en, details_ar } = req.body;
+  const { title_en, title_ar, details_en, details_ar, brave_en, brave_ar } = req.body;
+
   const newsData = {
-    title: { en: title_en, ar: title_ar },
-    details: { en: details_en, ar: details_ar },
-    image: req.body.image ? req.body.image : null, // Use Cloudinary URL
+    content: [
+      {
+        title: { en: title_en, ar: title_ar },
+        details: { en: details_en, ar: details_ar },
+      },
+    ],
+    brave: { en: brave_en, ar: brave_ar },
+    image: req.body.image || null,
   };
 
-  let news;
-  if (title_en) {
-    news = await News.create(newsData);
-  } else {
-    news = await News.create(req.body);
-  }
-
+  const news = await News.create(newsData);
   res.status(201).json({ success: true, data: news });
 });
 
@@ -87,6 +125,7 @@ exports.createNews = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/news/:id
 // @access  Private
 exports.updateNews = asyncHandler(async (req, res, next) => {
+  ensureDirectory();
   let news = await News.findById(req.params.id);
   if (!news) {
     let { ar, en } = messages.newsNotFound;
@@ -96,23 +135,45 @@ exports.updateNews = asyncHandler(async (req, res, next) => {
   }
 
   if (req.file) {
-    // If there's an existing image, delete it from Cloudinary
     if (news.image) {
       try {
-        // Extract public_id from the Cloudinary URL
-        const publicId = news.image.split('/').pop().split('.')[0];
-        await cloudinary.uploader.destroy(`Alweam/news/${publicId}`);
-        console.log(`Deleted old image from Cloudinary: ${publicId}`);
+        const oldFilePath = path.join(__dirname, '..', '..', news.image);
+        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
       } catch (error) {
-        console.error('Failed to delete image from Cloudinary:', error);
+        console.error('Failed to delete image from local storage:', error);
       }
     }
-
-    // Update with new Cloudinary URL
-    req.body.image = req.file.path;
+    try {
+      req.body.image = await processImage(req.file);
+    } catch (error) {
+      return next(new ErrorResponse(error.message, 400));
+    }
   }
 
-  news = await News.findByIdAndUpdate(req.params.id, req.body, {
+  const updateData = {};
+  if (req.body.title_en || req.body.title_ar || req.body.details_en || req.body.details_ar) {
+    updateData.content = [
+      {
+        title: {
+          en: req.body.title_en || news.content[0].title.en,
+          ar: req.body.title_ar || news.content[0].title.ar,
+        },
+        details: {
+          en: req.body.details_en || news.content[0].details.en,
+          ar: req.body.details_ar || news.content[0].details.ar,
+        },
+      },
+    ];
+  }
+  if (req.body.brave_en || req.body.brave_ar) {
+    updateData.brave = {
+      en: req.body.brave_en || news.brave.en,
+      ar: req.body.brave_ar || news.brave.ar,
+    };
+  }
+  if (req.body.image) updateData.image = req.body.image;
+
+  news = await News.findByIdAndUpdate(req.params.id, updateData, {
     new: true,
     runValidators: true,
   });
@@ -132,15 +193,12 @@ exports.deleteNews = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse({ en, ar }, 404));
   }
 
-  // Delete the image from Cloudinary if it exists
   if (news.image) {
     try {
-      // Extract public_id from the Cloudinary URL
-      const publicId = news.image.split('/').pop().split('.')[0];
-      await cloudinary.uploader.destroy(`Alweam/news/${publicId}`);
-      console.log(`Deleted image from Cloudinary: ${publicId}`);
+      const filePath = path.join(__dirname, '..', '..', news.image);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     } catch (error) {
-      console.error('Failed to delete image from Cloudinary:', error);
+      console.error('Failed to delete image from local storage:', error);
     }
   }
 

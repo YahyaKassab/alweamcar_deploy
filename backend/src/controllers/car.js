@@ -1,17 +1,50 @@
+const fs = require('fs');
+const path = require('path');
+const sharp = require('sharp');
 const Car = require('../models/Car');
 const Make = require('../models/Make');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const mongoose = require('mongoose');
 const messages = require('../locales/messages');
-const cloudinary = require('cloudinary').v2;
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Set image directory
+const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'uploads');
+const imagesDestDirCars = path.join(uploadsBaseDir, 'cars');
+
+// Ensure cars directory exists
+const ensureDirectory = () => {
+  if (!fs.existsSync(imagesDestDirCars)) {
+    fs.mkdirSync(imagesDestDirCars, { recursive: true });
+  }
+};
+
+// Utility to validate and resize image
+const processImage = async (file) => {
+  const fileSizeInMB = file.size / (1024 * 1024);
+  const destPath = path.join(imagesDestDirCars, file.filename);
+
+  if (fileSizeInMB > 1) {
+    const resizedBuffer = await sharp(file.path)
+      .resize({ width: 1200, withoutEnlargement: true })
+      .jpeg({ quality: 80 })
+      .toBuffer();
+
+    const resizedSizeInMB = resizedBuffer.length / (1024 * 1024);
+    if (resizedSizeInMB > 1) {
+      throw new Error(
+        `Image ${file.filename} could not be resized below 1MB (${resizedSizeInMB.toFixed(2)}MB)`
+      );
+    }
+
+    fs.writeFileSync(destPath, resizedBuffer);
+    fs.unlinkSync(file.path); // Remove temp file
+  } else {
+    fs.renameSync(file.path, destPath);
+  }
+
+  return `/uploads/cars/${file.filename}`;
+};
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -19,9 +52,7 @@ exports.getCars = asyncHandler(async (req, res) => {
   const { make, model, year, condition, page = 1, limit = 10 } = req.query;
 
   const query = {};
-  if (make && isValidObjectId(make)) {
-    query.make = make;
-  }
+  if (make && isValidObjectId(make)) query.make = make;
   if (model) query['model.en'] = model;
   if (year) query.year = year;
   if (condition) query.condition = condition;
@@ -46,18 +77,13 @@ exports.getCars = asyncHandler(async (req, res) => {
 
 exports.getCar = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
-  if (!car) {
-    return next(new ErrorResponse(messages.notFound, 404));
-  }
-
+  if (!car) return next(new ErrorResponse(messages.notFound, 404));
   res.status(200).json({ success: true, data: car });
 });
 
 exports.getSimilarCars = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
-  if (!car) {
-    return next(new ErrorResponse(messages.notFound, 404));
-  }
+  if (!car) return next(new ErrorResponse(messages.notFound, 404));
 
   const similarCars = await Car.find({
     make: car.make,
@@ -73,7 +99,7 @@ exports.getSimilarCars = asyncHandler(async (req, res, next) => {
 
 exports.getMakes = asyncHandler(async (req, res) => {
   const total = await Make.countDocuments();
-  const makes = await Make.find({}, 'name models').sort('name.en'); // Sort by English name
+  const makes = await Make.find({}, 'name models').sort('name.en');
 
   res.status(200).json({
     success: true,
@@ -82,10 +108,11 @@ exports.getMakes = asyncHandler(async (req, res) => {
     data: makes,
   });
 });
+
 exports.createCar = asyncHandler(async (req, res, next) => {
+  ensureDirectory();
   const carData = { ...req.body };
 
-  // Handle make/model creation (unchanged)
   if (!isValidObjectId(carData.make)) {
     const { make, model } = carData;
     if (!make?.en || !make?.ar || !model?.en || !model?.ar) {
@@ -120,34 +147,35 @@ exports.createCar = asyncHandler(async (req, res, next) => {
     carData.model = { en: normalizedModelEn, ar: normalizedModelAr };
   }
 
-  // Handle Cloudinary image upload
   if (req.files && req.files.length > 0) {
-    carData.images = req.files.map((file, index) => ({
-      url: file.path,
-      main: index === 0, // First image is always main
-    }));
+    try {
+      carData.images = await Promise.all(
+        req.files.map(async (file, index) => ({
+          url: await processImage(file),
+          main: index === 0,
+        }))
+      );
+    } catch (error) {
+      return next(new ErrorResponse(error.message, 400));
+    }
   } else if (carData.images && carData.images.length > 0) {
-    // If images are provided in body, set first as main by default
     carData.images = carData.images.map((img, index) => ({
-      url: img.url || img, // Handle string or object input
-      main: index === 0, // First image is always main, overrides any provided main flags
+      url: img.url || img,
+      main: index === 0,
     }));
   }
 
   const car = await Car.create(carData);
-
   res.status(201).json({ success: true, data: car });
 });
 
 exports.updateCar = asyncHandler(async (req, res, next) => {
+  ensureDirectory();
   let car = await Car.findById(req.params.id);
-  if (!car) {
-    return next(new ErrorResponse(messages.notFound, 404));
-  }
+  if (!car) return next(new ErrorResponse(messages.notFound, 404));
 
   const carData = { ...req.body };
 
-  // Handle make/model updates (unchanged)
   if (!isValidObjectId(carData.make)) {
     const { make, model } = carData;
     if (!make?.en || !make?.ar || !model?.en || !model?.ar) {
@@ -182,37 +210,40 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
     carData.model = { en: normalizedModelEn, ar: normalizedModelAr };
   }
 
-  // Handle Cloudinary image upload
   if (req.files && req.files.length > 0) {
-    const newImagePaths = req.files.map((file, index) => ({
-      url: file.path,
-      main: index === 0, // First new image is main
-    }));
+    let newImagePaths;
+    try {
+      newImagePaths = await Promise.all(
+        req.files.map(async (file, index) => ({
+          url: await processImage(file),
+          main: index === 0,
+        }))
+      );
+    } catch (error) {
+      return next(new ErrorResponse(error.message, 400));
+    }
 
     if (req.body.replaceImages === 'true') {
-      // Delete existing images from Cloudinary
       for (const image of car.images) {
         try {
-          const publicId = image.url.split('/').pop().split('.')[0];
-          await cloudinary.uploader.destroy(`Alweam/cars/${publicId}`);
+          const filePath = path.join(__dirname, '..', '..', image.url);
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         } catch (error) {
-          console.error('Failed to delete image from Cloudinary:', error);
+          console.error('Failed to delete image from local storage:', error);
         }
       }
       carData.images = newImagePaths;
     } else {
-      // Append new images, keeping first of new set as main if no existing main
       const combinedImages = [...car.images, ...newImagePaths];
       carData.images = combinedImages.map((img, index) => ({
         url: img.url,
-        main: index === 0, // First image in combined list is main
+        main: index === 0,
       }));
     }
   } else if (carData.images && carData.images.length > 0) {
-    // If images are provided in body, set first as main
     carData.images = carData.images.map((img, index) => ({
-      url: img.url || img, // Handle string or object input
-      main: index === 0, // First image is always main
+      url: img.url || img,
+      main: index === 0,
     }));
   }
 
@@ -223,22 +254,20 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: car });
 });
+
 exports.deleteCar = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
-  if (!car) {
-    return next(new ErrorResponse(messages.notFound, 404));
-  }
+  if (!car) return next(new ErrorResponse(messages.notFound, 404));
 
-  for (const imageUrl of car.images) {
+  for (const image of car.images) {
     try {
-      const publicId = imageUrl.split('/').pop().split('.')[0];
-      await cloudinary.uploader.destroy(`Alweam/cars/${publicId}`);
+      const filePath = path.join(__dirname, '..', '..', image.url);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     } catch (error) {
-      console.error('Failed to delete image from Cloudinary:', error);
+      console.error('Failed to delete image from local storage:', error);
     }
   }
 
   await Car.deleteOne({ _id: req.params.id });
-
   res.status(200).json({ success: true, message: messages.deleted });
 });

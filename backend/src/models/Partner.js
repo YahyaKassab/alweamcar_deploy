@@ -12,10 +12,6 @@ const PartnerSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Partner URL is required'],
       trim: true,
-      match: [
-        /^https?:\/\/[^\s$.?#].[^\s]*$/,
-        messages.invalidUrl?.en || 'Please provide a valid URL',
-      ],
     },
     image: {
       type: String,

@@ -6,7 +6,7 @@ services:
     container_name: mongodb
     restart: always
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongo-data:/data/db
     networks:
@@ -16,10 +16,10 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
       - MONGO_INITDB_DATABASE=car-website
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
   backend:
     build:
@@ -30,9 +30,9 @@ services:
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
-      - ./uploads:/usr/src/app/public/uploads/images
+      # - ./uploads:/usr/src/app/public/uploads/images
     ports:
-      - "5000:5000"
+      - '5000:5000'
     depends_on:
       - mongodb
     networks:
@@ -45,10 +45,10 @@ services:
       - EMAIL_PASSWORD=lgpo gbls xgem vqzv
       - EMAIL_USERNAME=ya7yakassab@gmail.com
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
   frontend:
     build:
@@ -57,16 +57,16 @@ services:
     container_name: frontend
     restart: always
     ports:
-      - "80:80" # Maps host port 80 to container port 80 (Nginx inside)
+      - '80:80' # Maps host port 80 to container port 80 (Nginx inside)
     depends_on:
       - backend
     networks:
       - alweam-network
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
 networks:
   alweam-network:

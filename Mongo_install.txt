@@ -19,22 +19,25 @@ mongod --version
 
 
 
-
-terms list{title, desc, order}
-TEST news title, details{html}, brave + about
-SEED ALL OF THIS
+Why models got id?
+car image same
+terms is null
+NEXT about html list thing
 
 DONE	
-filter by make, Id
-Images of home page[what we do, brands, news, showroom]
-Social Item: mobile, insta, tiktok, youtube, snapchat, location, email, whatsapp number, sales numbers[]
-add arabic in everything #ask
-1 image is main
-add partners
-news latest
-Feedback pic
-What we do pic
-terms pic
-FAQs ar en #delete not showing up
-news: details, brave #ask
-Edit Password
+✔filter by make, Id 
+✔Images of home page[what we do, brands, news, showroom]
+✔Social Item: mobile, insta, tiktok, youtube, snapchat, location, email, whatsapp number, sales numbers[]
+✔add arabic in everything
+✔1 image is main
+✔add partners
+✔news latest
+✔Feedback pic
+✔What we do pic
+✔terms pic
+✔FAQs ar en 
+✔news: details, brave #ask
+✔Edit Password
+✔terms list{title, details, order}
+TEST news title, details{html}, brave + about
+SEED ALL OF THIS

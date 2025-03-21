@@ -251,7 +251,7 @@ router.get('/:id/similar', getSimilarCars);
  *       401:
  *         description: Not authorized
  */
-router.route('/').get(getCars).post(protect, uploadCar.array('images', 10), createCar);
+router.route('/').get(getCars).post(protect, createCar);
 
 /**
  * @swagger
@@ -440,10 +440,6 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images', 10), crea
  *       404:
  *         description: Car not found
  */
-router
-  .route('/:id')
-  .get(getCar)
-  .put(protect, uploadCar.array('images', 10), updateCar)
-  .delete(protect, deleteCar);
+router.route('/:id').get(getCar).put(protect, updateCar).delete(protect, deleteCar);
 
 module.exports = router;

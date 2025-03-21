@@ -114,6 +114,6 @@ router.route('/').get(getHomePageImages);
  *       401:
  *         description: Unauthorized
  */
-router.route('/').put(protect, uploadHome, updateHomePageImages);
+router.route('/').put(protect, updateHomePageImages);
 
 module.exports = router;
