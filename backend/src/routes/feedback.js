@@ -47,6 +47,7 @@ const router = express.Router();
  *
  *   post:
  *     summary: Create new feedback
+ *     tags: [Feedbacks]
  *     description: Submit feedback (public route)
  *     requestBody:
  *       required: true
@@ -99,6 +100,7 @@ router.route('/').get(protect, getFeedbacks).post(createFeedback);
  *         description: Feedback not found
  *   delete:
  *     summary: Delete feedback
+ *     tags: [Feedbacks]
  *     description: Remove a feedback entry by ID (protected route)
  *     parameters:
  *       - in: path

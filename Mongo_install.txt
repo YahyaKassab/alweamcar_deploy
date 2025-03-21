@@ -20,7 +20,8 @@ mongod --version
 
 
 
-
+terms list{title, desc, order}
+TEST news title, details{html}, brave + about
 SEED ALL OF THIS
 
 DONE	
