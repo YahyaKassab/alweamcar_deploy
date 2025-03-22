@@ -72,7 +72,7 @@ exports.createNews = asyncHandler(async (req, res, next) => {
     req.body.image = `/uploads/news/${req.file.filename}`; // Set image URL from multer/sharp
   }
 
-  const { title_en, title_ar, details_en, details_ar, brave_en, brave_ar } = req.body;
+  const { title_en, title_ar, details_en, details_ar, preview_en, preview_ar } = req.body;
 
   const newsData = {
     content: [
@@ -81,7 +81,7 @@ exports.createNews = asyncHandler(async (req, res, next) => {
         details: { en: details_en, ar: details_ar },
       },
     ],
-    brave: { en: brave_en, ar: brave_ar },
+    preview: { en: preview_en, ar: preview_ar },
     image: req.body.image || null,
   };
 
@@ -132,10 +132,10 @@ exports.updateNews = asyncHandler(async (req, res, next) => {
       },
     ];
   }
-  if (req.body.brave_en || req.body.brave_ar) {
-    updateData.brave = {
-      en: req.body.brave_en || news.brave.en,
-      ar: req.body.brave_ar || news.brave.ar,
+  if (req.body.preview_en || req.body.preview_ar) {
+    updateData.preview = {
+      en: req.body.preview_en || news.preview.en,
+      ar: req.body.preview_ar || news.preview.ar,
     };
   }
   if (req.body.image) updateData.image = req.body.image;

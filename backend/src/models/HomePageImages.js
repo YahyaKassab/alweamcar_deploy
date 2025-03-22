@@ -32,12 +32,12 @@ HomePageImagesSchema.statics.getInstance = async function () {
   let instance = await this.findOne();
   if (!instance) {
     instance = await this.create({
-      whatWeDo: 'whatwedo.jpg',
-      brands: 'brands.jpg',
-      news: 'news.jpg',
-      showroom: 'showroom.jpg',
-      feedback: 'feedback.jpg',
-      terms: 'terms.jpg',
+      whatWeDo: '/uploads/home/whatwedo.jpg',
+      brands: '/uploads/home/brands.jpg',
+      news: '/uploads/home/news.jpg',
+      showroom: '/uploads/home/showroom.jpg',
+      feedback: '/uploads/home/feedback.jpg',
+      terms: '/uploads/home/terms.jpg',
     });
   }
   return instance;

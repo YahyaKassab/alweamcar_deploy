@@ -26,21 +26,38 @@ const router = express.Router();
  *                   type: object
  *                   properties:
  *                     content:
- *                       type: object
- *                       properties:
- *                         en:
- *                           type: string
- *                           example: "Our mission is to provide..."
- *                         ar:
- *                           type: string
- *                           example: "مهمتنا هي تقديم..."
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           title:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Default Title in English"
+ *                               ar:
+ *                                 type: string
+ *                                 example: "العنوان الافتراضي بالعربية"
+ *                           details:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Default details in English."
+ *                               ar:
+ *                                 type: string
+ *                                 example: "تفاصيل افتراضية بالعربية."
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
+ *                       example: "2025-03-22T12:00:00Z"
  *   put:
  *     summary: Update the "What We Do" content
  *     description: Updates the "What We Do" section content in both English and Arabic.
  *     tags: [What We Do]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -49,14 +66,30 @@ const router = express.Router();
  *             type: object
  *             properties:
  *               content:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     example: "Updated content in English."
- *                   ar:
- *                     type: string
- *                     example: "المحتوى المحدث باللغة العربية."
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                           example: "Updated Title in English"
+ *                         ar:
+ *                           type: string
+ *                           example: "العنوان المحدث بالعربية"
+ *                     details:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                           example: "Updated details in English."
+ *                         ar:
+ *                           type: string
+ *                           example: "التفاصيل المحدثة بالعربية."
+ *             required:
+ *               - content
  *     responses:
  *       200:
  *         description: Successfully updated content
@@ -72,17 +105,32 @@ const router = express.Router();
  *                   type: object
  *                   properties:
  *                     content:
- *                       type: object
- *                       properties:
- *                         en:
- *                           type: string
- *                           example: "Updated English content."
- *                         ar:
- *                           type: string
- *                           example: "تم تحديث المحتوى العربي."
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           title:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Updated Title in English"
+ *                               ar:
+ *                                 type: string
+ *                                 example: "العنوان المحدث بالعربية"
+ *                           details:
+ *                             type: object
+ *                             properties:
+ *                               en:
+ *                                 type: string
+ *                                 example: "Updated details in English."
+ *                               ar:
+ *                                 type: string
+ *                                 example: "التفاصيل المحدثة بالعربية."
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
+ *                       example: "2025-03-22T12:00:00Z"
  *       401:
  *         description: Unauthorized, authentication required
  *       400:

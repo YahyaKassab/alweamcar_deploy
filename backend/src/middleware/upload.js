@@ -60,10 +60,10 @@ const processImage = async (req, res, next) => {
 
     try {
       await sharp(inputPath)
-        .resize(1200, null, { withoutEnlargement: true }) // Resize width to 1200px, maintain aspect ratio
-        .jpeg({ quality: 80, mozjpeg: true })
-        .png({ quality: 80, compressionLevel: 9 })
-        .webp({ quality: 80 })
+        .resize(2400, null, { withoutEnlargement: true }) // Keep width at 2400px, maintain aspect ratio
+        .jpeg({ quality: 85, mozjpeg: false }) // Lower quality to 85, no optimization
+        .png({ quality: 90, compressionLevel: 2 }) // Quality at 90, minimal compression
+        .webp({ quality: 85, lossless: false }) // Quality at 85, lossy mode
         .toFile(tempPath);
 
       await fsPromises.rename(tempPath, inputPath);

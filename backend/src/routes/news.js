@@ -60,12 +60,12 @@ router.route('/').get(getAllNews);
  *               details_ar:
  *                 type: string
  *                 description: News details in Arabic
- *               brave_en:
+ *               preview_en:
  *                 type: string
- *                 description: Brave text in English
- *               brave_ar:
+ *                 description: preview text in English
+ *               preview_ar:
  *                 type: string
- *                 description: Brave text in Arabic
+ *                 description: preview text in Arabic
  *               image:
  *                 type: string
  *                 format: binary
@@ -130,12 +130,12 @@ router.route('/:id').get(getNews);
  *               details_ar:
  *                 type: string
  *                 description: Updated news details in Arabic
- *               brave_en:
+ *               preview_en:
  *                 type: string
- *                 description: Updated brave text in English
- *               brave_ar:
+ *                 description: Updated preview text in English
+ *               preview_ar:
  *                 type: string
- *                 description: Updated brave text in Arabic
+ *                 description: Updated preview text in Arabic
  *               image:
  *                 type: string
  *                 format: binary
