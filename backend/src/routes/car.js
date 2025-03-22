@@ -9,7 +9,7 @@ const {
   getMakes,
 } = require('../controllers/car');
 const { protect } = require('../middleware/auth');
-const { uploadCar } = require('../middleware/upload');
+const { uploadCar } = require('../controllers/car');
 
 const router = express.Router();
 
@@ -122,6 +122,8 @@ router.get('/:id/similar', getSimilarCars);
  *   post:
  *     summary: Create a new car
  *     tags: [Cars]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -141,99 +143,72 @@ router.get('/:id/similar', getSimilarCars);
  *               - price
  *             properties:
  *               make:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English name of the make
- *                   ar:
- *                     type: string
- *                     description: Arabic name of the make
- *                 description: Make object or existing Make ID
- *               model:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English model name
- *                   ar:
- *                     type: string
- *                     description: Arabic model name
- *                 required: [en, ar]
+ *                 type: string
+ *                 description: Make ID (reference to an existing Make)
+ *               model[en]:
+ *                 type: string
+ *                 description: English model name
+ *               model[ar]:
+ *                 type: string
+ *                 description: Arabic model name
  *               year:
  *                 type: integer
+ *                 description: Manufacturing year
  *               condition:
  *                 type: string
  *                 enum: [Brand New, Elite Approved]
+ *                 description: Condition of the car
  *               mileage:
  *                 type: number
+ *                 description: Mileage in kilometers
  *               stockNumber:
  *                 type: string
- *               exteriorColor:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English exterior color
- *                   ar:
- *                     type: string
- *                     description: Arabic exterior color
- *               interiorColor:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English interior color
- *                   ar:
- *                     type: string
- *                     description: Arabic interior color
- *               engine:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English engine description
- *                   ar:
- *                     type: string
- *                     description: Arabic engine description
- *               bhp:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English brake horsepower
- *                   ar:
- *                     type: string
- *                     description: Arabic brake horsepower
+ *                 description: Unique stock number
+ *               exteriorColor[en]:
+ *                 type: string
+ *                 description: English exterior color
+ *               exteriorColor[ar]:
+ *                 type: string
+ *                 description: Arabic exterior color
+ *               interiorColor[en]:
+ *                 type: string
+ *                 description: English interior color
+ *               interiorColor[ar]:
+ *                 type: string
+ *                 description: Arabic interior color
+ *               engine[en]:
+ *                 type: string
+ *                 description: English engine description
+ *               engine[ar]:
+ *                 type: string
+ *                 description: Arabic engine description
+ *               bhp[en]:
+ *                 type: string
+ *                 description: English brake horsepower
+ *               bhp[ar]:
+ *                 type: string
+ *                 description: Arabic brake horsepower
  *               door:
  *                 type: integer
+ *                 description: Number of doors
  *               warranty:
  *                 type: boolean
- *               name:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English car name
- *                   ar:
- *                     type: string
- *                     description: Arabic car name
- *                 required: [en, ar]
+ *                 description: Warranty status
+ *               name[en]:
+ *                 type: string
+ *                 description: English car name
+ *               name[ar]:
+ *                 type: string
+ *                 description: Arabic car name
  *               price:
  *                 type: number
+ *                 description: Price in currency
  *               images:
  *                 type: array
  *                 items:
- *                   type: object
- *                   properties:
- *                     url:
- *                       type: string
- *                       format: binary
- *                       description: Image file or URL
- *                     main:
- *                       type: boolean
- *                       description: Whether this is the main image (first image is set as main by default)
- *                   example: { "url": "image1.jpg", "main": true }
+ *                   type: string
+ *                   format: binary
+ *                 description: Array of image files (select multiple files from file explorer)
  *     responses:
  *       201:
  *         description: Car created successfully
@@ -251,7 +226,7 @@ router.get('/:id/similar', getSimilarCars);
  *       401:
  *         description: Not authorized
  */
-router.route('/').get(getCars).post(protect, createCar);
+router.route('/').get(getCars).post(protect, uploadCar.array('images'), createCar);
 
 /**
  * @swagger
@@ -284,6 +259,8 @@ router.route('/').get(getCars).post(protect, createCar);
  *   put:
  *     summary: Update a car
  *     tags: [Cars]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -299,101 +276,77 @@ router.route('/').get(getCars).post(protect, createCar);
  *             type: object
  *             properties:
  *               make:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English name of the make
- *                   ar:
- *                     type: string
- *                     description: Arabic name of the make
- *                 description: Make object or existing Make ID
- *               model:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English model name
- *                   ar:
- *                     type: string
- *                     description: Arabic model name
+ *                 type: string
+ *                 description: Make ID (reference to an existing Make), or leave blank
+ *               model[en]:
+ *                 type: string
+ *                 description: English model name, optional
+ *               model[ar]:
+ *                 type: string
+ *                 description: Arabic model name, optional
  *               year:
  *                 type: integer
+ *                 description: Manufacturing year, optional
  *               condition:
  *                 type: string
  *                 enum: [Brand New, Elite Approved]
+ *                 description: Condition of the car, optional
  *               mileage:
  *                 type: number
+ *                 description: Mileage in kilometers, optional
  *               stockNumber:
  *                 type: string
- *               exteriorColor:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English exterior color
- *                   ar:
- *                     type: string
- *                     description: Arabic exterior color
- *               interiorColor:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English interior color
- *                   ar:
- *                     type: string
- *                     description: Arabic interior color
- *               engine:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English engine description
- *                   ar:
- *                     type: string
- *                     description: Arabic engine description
- *               bhp:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English brake horsepower
- *                   ar:
- *                     type: string
- *                     description: Arabic brake horsepower
+ *                 description: Unique stock number, optional
+ *               exteriorColor[en]:
+ *                 type: string
+ *                 description: English exterior color, optional
+ *               exteriorColor[ar]:
+ *                 type: string
+ *                 description: Arabic exterior color, optional
+ *               interiorColor[en]:
+ *                 type: string
+ *                 description: English interior color, optional
+ *               interiorColor[ar]:
+ *                 type: string
+ *                 description: Arabic interior color, optional
+ *               engine[en]:
+ *                 type: string
+ *                 description: English engine description, optional
+ *               engine[ar]:
+ *                 type: string
+ *                 description: Arabic engine description, optional
+ *               bhp[en]:
+ *                 type: string
+ *                 description: English brake horsepower, optional
+ *               bhp[ar]:
+ *                 type: string
+ *                 description: Arabic brake horsepower, optional
  *               door:
  *                 type: integer
+ *                 description: Number of doors, optional
  *               warranty:
  *                 type: boolean
- *               name:
- *                 type: object
- *                 properties:
- *                   en:
- *                     type: string
- *                     description: English car name
- *                   ar:
- *                     type: string
- *                     description: Arabic car name
+ *                 description: Warranty status, optional
+ *               name[en]:
+ *                 type: string
+ *                 description: English car name, optional
+ *               name[ar]:
+ *                 type: string
+ *                 description: Arabic car name, optional
  *               price:
  *                 type: number
+ *                 description: Price in currency, optional
  *               images:
  *                 type: array
  *                 items:
- *                   type: object
- *                   properties:
- *                     url:
- *                       type: string
- *                       format: binary
- *                       description: Image file or URL
- *                     main:
- *                       type: boolean
- *                       description: Whether this is the main image (first image is set as main by default)
- *                   example: { "url": "image1.jpg", "main": true }
+ *                   type: string
+ *                   format: binary
+ *                 description: Array of image files (select multiple files from file explorer), optional
  *               replaceImages:
  *                 type: string
  *                 enum: ['true', 'false']
- *                 description: Whether to replace existing images or add to them
+ *                 description: Whether to replace existing images or add to them, optional
+ *             description: At least one field must be provided to update the car. All fields are optional.
  *     responses:
  *       200:
  *         description: Car updated
@@ -407,7 +360,7 @@ router.route('/').get(getCars).post(protect, createCar);
  *                 data:
  *                   $ref: '#/components/schemas/Car'
  *       400:
- *         description: Invalid input
+ *         description: No fields provided or invalid input
  *       401:
  *         description: Not authorized
  *       404:
@@ -440,6 +393,10 @@ router.route('/').get(getCars).post(protect, createCar);
  *       404:
  *         description: Car not found
  */
-router.route('/:id').get(getCar).put(protect, updateCar).delete(protect, deleteCar);
+router
+  .route('/:id')
+  .get(getCar)
+  .put(protect, uploadCar.array('images'), updateCar)
+  .delete(protect, deleteCar);
 
 module.exports = router;

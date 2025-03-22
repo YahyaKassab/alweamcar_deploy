@@ -40,4 +40,4 @@ DONE
 ✔Edit Password
 ✔terms list{title, details, order}
 TEST news title, details{html}, brave + about
-SEED ALL OF THIS
+✔SEED ALL OF THIS
