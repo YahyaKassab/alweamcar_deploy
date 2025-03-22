@@ -6,10 +6,9 @@ const {
   updateCar,
   deleteCar,
   getSimilarCars,
-  getMakes,
 } = require('../controllers/car');
 const { protect } = require('../middleware/auth');
-const { uploadCar } = require('../controllers/car');
+const { uploadCar } = require('../middleware/upload'); // Import uploadCar from uploads.js
 
 const router = express.Router();
 
@@ -122,8 +121,6 @@ router.get('/:id/similar', getSimilarCars);
  *   post:
  *     summary: Create a new car
  *     tags: [Cars]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -133,7 +130,6 @@ router.get('/:id/similar', getSimilarCars);
  *             required:
  *               - make
  *               - model[en]
- *               - model[ar]
  *               - year
  *               - condition
  *               - mileage
@@ -150,7 +146,7 @@ router.get('/:id/similar', getSimilarCars);
  *                 description: English model name
  *               model[ar]:
  *                 type: string
- *                 description: Arabic model name
+ *                 description: Arabic model name (optional)
  *               year:
  *                 type: integer
  *                 description: Manufacturing year
@@ -225,8 +221,10 @@ router.get('/:id/similar', getSimilarCars);
  *         description: Missing required field or invalid input
  *       401:
  *         description: Not authorized
+ *       404:
+ *         description: Make not found
  */
-router.route('/').get(getCars).post(protect, uploadCar.array('images'), createCar);
+router.route('/').get(getCars).post(protect, uploadCar, createCar);
 
 /**
  * @swagger
@@ -259,8 +257,6 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images'), createCa
  *   put:
  *     summary: Update a car
  *     tags: [Cars]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -269,7 +265,7 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images'), createCa
  *         required: true
  *         description: ID of the car
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -277,76 +273,75 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images'), createCa
  *             properties:
  *               make:
  *                 type: string
- *                 description: Make ID (reference to an existing Make), or leave blank
+ *                 description: Make ID (reference to an existing Make)
  *               model[en]:
  *                 type: string
- *                 description: English model name, optional
+ *                 description: English model name
  *               model[ar]:
  *                 type: string
- *                 description: Arabic model name, optional
+ *                 description: Arabic model name (optional)
  *               year:
  *                 type: integer
- *                 description: Manufacturing year, optional
+ *                 description: Manufacturing year
  *               condition:
  *                 type: string
  *                 enum: [Brand New, Elite Approved]
- *                 description: Condition of the car, optional
+ *                 description: Condition of the car
  *               mileage:
  *                 type: number
- *                 description: Mileage in kilometers, optional
+ *                 description: Mileage in kilometers
  *               stockNumber:
  *                 type: string
- *                 description: Unique stock number, optional
+ *                 description: Unique stock number
  *               exteriorColor[en]:
  *                 type: string
- *                 description: English exterior color, optional
+ *                 description: English exterior color
  *               exteriorColor[ar]:
  *                 type: string
- *                 description: Arabic exterior color, optional
+ *                 description: Arabic exterior color
  *               interiorColor[en]:
  *                 type: string
- *                 description: English interior color, optional
+ *                 description: English interior color
  *               interiorColor[ar]:
  *                 type: string
- *                 description: Arabic interior color, optional
+ *                 description: Arabic interior color
  *               engine[en]:
  *                 type: string
- *                 description: English engine description, optional
+ *                 description: English engine description
  *               engine[ar]:
  *                 type: string
- *                 description: Arabic engine description, optional
+ *                 description: Arabic engine description
  *               bhp[en]:
  *                 type: string
- *                 description: English brake horsepower, optional
+ *                 description: English brake horsepower
  *               bhp[ar]:
  *                 type: string
- *                 description: Arabic brake horsepower, optional
+ *                 description: Arabic brake horsepower
  *               door:
  *                 type: integer
- *                 description: Number of doors, optional
+ *                 description: Number of doors
  *               warranty:
  *                 type: boolean
- *                 description: Warranty status, optional
+ *                 description: Warranty status
  *               name[en]:
  *                 type: string
- *                 description: English car name, optional
+ *                 description: English car name
  *               name[ar]:
  *                 type: string
- *                 description: Arabic car name, optional
+ *                 description: Arabic car name
  *               price:
  *                 type: number
- *                 description: Price in currency, optional
+ *                 description: Price in currency
  *               images:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: Array of image files (select multiple files from file explorer), optional
+ *                 description: Array of image files (select multiple files from file explorer)
  *               replaceImages:
  *                 type: string
  *                 enum: ['true', 'false']
- *                 description: Whether to replace existing images or add to them, optional
- *             description: At least one field must be provided to update the car. All fields are optional.
+ *                 description: Whether to replace existing images or add to them
  *     responses:
  *       200:
  *         description: Car updated
@@ -360,11 +355,11 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images'), createCa
  *                 data:
  *                   $ref: '#/components/schemas/Car'
  *       400:
- *         description: No fields provided or invalid input
+ *         description: Invalid input
  *       401:
  *         description: Not authorized
  *       404:
- *         description: Car not found
+ *         description: Car or Make not found
  *
  *   delete:
  *     summary: Delete a car
@@ -386,17 +381,13 @@ router.route('/').get(getCars).post(protect, uploadCar.array('images'), createCa
  *               properties:
  *                 success:
  *                   type: boolean
- *                 data:
- *                   type: object
+ *                 message:
+ *                   type: string
  *       401:
  *         description: Not authorized
  *       404:
  *         description: Car not found
  */
-router
-  .route('/:id')
-  .get(getCar)
-  .put(protect, uploadCar.array('images'), updateCar)
-  .delete(protect, deleteCar);
+router.route('/:id').get(getCar).put(protect, uploadCar, updateCar).delete(protect, deleteCar);
 
 module.exports = router;

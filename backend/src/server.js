@@ -7,7 +7,7 @@ const path = require('path');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimit = require('express-rate-limit');
-const { swaggerUi, swaggerDocs } = require('./config/swagger');
+const { swaggerUi, swaggerDocs, swaggerUiOptions } = require('./config/swagger');
 const { createRootAdmin } = require('./adminSeeder');
 // Rate limiter configuration
 const limiter = rateLimit({
@@ -73,8 +73,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Mount Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOptions));
 // Mount routers
 app.use('/api/auth', authRoutes);
 app.use('/api/admins', adminRoutes);

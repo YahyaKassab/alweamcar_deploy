@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp');
-const multer = require('multer');
 const Car = require('../models/Car');
 const Make = require('../models/Make');
 const ErrorResponse = require('../utils/errorResponse');
@@ -9,73 +7,10 @@ const asyncHandler = require('../utils/asyncHandler');
 const mongoose = require('mongoose');
 const messages = require('../locales/messages');
 
-// Set image directory
-const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'uploads');
-const imagesDestDirCars = path.join(uploadsBaseDir, 'cars');
-
-// Ensure cars directory exists
-const ensureDirectory = () => {
-  if (!fs.existsSync(imagesDestDirCars)) {
-    fs.mkdirSync(imagesDestDirCars, { recursive: true });
-  }
-};
-
-// Configure Multer storage for cars
-const storageCars = multer.diskStorage({
-  destination: (req, file, cb) => {
-    ensureDirectory();
-    cb(null, imagesDestDirCars);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const filename = `image-${uniqueSuffix}${path.extname(file.originalname)}`;
-    cb(null, filename);
-  },
-});
-
-// File filter for image types
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  if (!allowedTypes.includes(file.mimetype)) {
-    return cb(new ErrorResponse(messages.invalidFileType, 400), false);
-  }
-  cb(null, true);
-};
-
-// Multer upload configuration for cars
-const uploadCar = multer({
-  storage: storageCars,
-  fileFilter: fileFilter,
-});
-
-const processImage = async (file) => {
-  const fileSizeInMB = file.size / (1024 * 1024);
-  const destPath = path.join(imagesDestDirCars, file.filename);
-
-  if (fileSizeInMB > 1) {
-    const resizedBuffer = await sharp(file.path)
-      .resize({ width: 1200, withoutEnlargement: true })
-      .jpeg({ quality: 80 })
-      .toBuffer();
-
-    const resizedSizeInMB = resizedBuffer.length / (1024 * 1024);
-    if (resizedSizeInMB > 1) {
-      fs.unlinkSync(file.path); // This line fails with EPERM
-      throw new Error(
-        `Image ${file.filename} could not be resized below 1MB (${resizedSizeInMB.toFixed(2)}MB)`
-      );
-    }
-
-    fs.writeFileSync(destPath, resizedBuffer);
-    fs.unlinkSync(file.path); // This line also fails with EPERM
-  } else {
-    fs.renameSync(file.path, destPath);
-  }
-
-  return `/uploads/cars/${file.filename}`;
-};
+// Utility function to check if an ID is valid
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
+// Get all cars
 exports.getCars = asyncHandler(async (req, res) => {
   const { make, model, year, condition, page = 1, limit = 10 } = req.query;
 
@@ -103,12 +38,14 @@ exports.getCars = asyncHandler(async (req, res) => {
   });
 });
 
+// Get a single car by ID
 exports.getCar = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
   if (!car) return next(new ErrorResponse(messages.notFound, 404));
   res.status(200).json({ success: true, data: car });
 });
 
+// Get similar cars
 exports.getSimilarCars = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
   if (!car) return next(new ErrorResponse(messages.notFound, 404));
@@ -125,6 +62,7 @@ exports.getSimilarCars = asyncHandler(async (req, res, next) => {
   });
 });
 
+// Get all makes
 exports.getMakes = asyncHandler(async (req, res) => {
   const total = await Make.countDocuments();
   const makes = await Make.find({}, 'name models').sort('name.en');
@@ -137,52 +75,39 @@ exports.getMakes = asyncHandler(async (req, res) => {
   });
 });
 
+// Create a new car
 exports.createCar = asyncHandler(async (req, res, next) => {
-  ensureDirectory();
   const carData = { ...req.body };
 
-  if (!isValidObjectId(carData.make)) {
-    const { make, model } = carData;
-    if (!make?.en || !make?.ar || !model?.en || !model?.ar) {
-      return next(new ErrorResponse(messages.make_model_required, 400));
-    }
-
-    const normalizedMakeNameEn = make.en.trim().toLowerCase();
-    const normalizedMakeNameAr = make.ar.trim().toLowerCase();
-    const normalizedModelEn = model.en.trim();
-    const normalizedModelAr = model.ar.trim();
-
-    let makeDoc = await Make.findOne({
-      'name.en': { $regex: new RegExp(`^${normalizedMakeNameEn}$`, 'i') },
-    });
-
-    if (!makeDoc) {
-      makeDoc = await Make.create({
-        name: { en: make.en, ar: make.ar },
-        models: [{ en: normalizedModelEn, ar: normalizedModelAr }],
-      });
-    } else {
-      const modelExists = makeDoc.models.some(
-        (m) => m.en.toLowerCase() === normalizedModelEn.toLowerCase()
-      );
-      if (!modelExists) {
-        makeDoc.models.push({ en: normalizedModelEn, ar: normalizedModelAr });
-        await makeDoc.save();
-      }
-    }
-
-    carData.make = makeDoc._id;
-    carData.model = { en: normalizedModelEn, ar: normalizedModelAr };
+  // Verify make is a valid ObjectId
+  if (!carData.make || !isValidObjectId(carData.make)) {
+    return next(new ErrorResponse('Valid make ID is required', 400));
   }
 
+  // Check if the make exists
+  const makeExists = await Make.findById(carData.make);
+  if (!makeExists) {
+    return next(new ErrorResponse('Make not found', 404));
+  }
+
+  // Ensure model.en is provided
+  if (!carData.model?.en) {
+    return next(new ErrorResponse('Model name in English is required', 400));
+  }
+
+  // Create model object with just en if ar is not provided
+  carData.model = {
+    en: carData.model.en,
+    ar: carData.model.ar || '',
+  };
+
+  // Handle image uploads if files are present
   if (req.files && req.files.length > 0) {
     try {
-      carData.images = await Promise.all(
-        req.files.map(async (file, index) => ({
-          url: await processImage(file),
-          main: index === 0,
-        }))
-      );
+      carData.images = req.files.map((file, index) => ({
+        url: file.url, // Use the processed URL from middleware
+        main: index === 0,
+      }));
     } catch (error) {
       return next(new ErrorResponse(error.message, 400));
     }
@@ -197,91 +122,66 @@ exports.createCar = asyncHandler(async (req, res, next) => {
   res.status(201).json({ success: true, data: car });
 });
 
-// @desc    Update a car
-// @route   PUT /api/cars/:id
-// @access  Private
+// Update a car
 exports.updateCar = asyncHandler(async (req, res, next) => {
-  ensureDirectory();
   let car = await Car.findById(req.params.id);
   if (!car) return next(new ErrorResponse(messages.notFound, 404));
 
   const carData = { ...req.body };
 
-  // Check if there's at least one field to update (including files)
-  if (Object.keys(carData).length === 0 && (!req.files || req.files.length === 0)) {
-    return next(new ErrorResponse('At least one field must be provided to update', 400));
-  }
-
-  // Handle make and model if provided
+  // If make is provided, verify it's a valid ObjectId
   if (carData.make) {
     if (!isValidObjectId(carData.make)) {
-      const { make, model } = carData;
-      if ((!make?.en || !make?.ar) && (!model?.en || !model?.ar)) {
-        delete carData.make;
-        delete carData.model;
-      } else {
-        const normalizedMakeNameEn = make.en?.trim().toLowerCase();
-        const normalizedMakeNameAr = make.ar?.trim().toLowerCase();
-        const normalizedModelEn = model?.en?.trim();
-        const normalizedModelAr = model?.ar?.trim();
-
-        let makeDoc = await Make.findOne({
-          'name.en': { $regex: new RegExp(`^${normalizedMakeNameEn}$`, 'i') },
-        });
-
-        if (!makeDoc) {
-          makeDoc = await Make.create({
-            name: { en: make.en || '', ar: make.ar || '' },
-            models: model ? [{ en: normalizedModelEn || '', ar: normalizedModelAr || '' }] : [],
-          });
-        } else if (model) {
-          const modelExists = makeDoc.models.some(
-            (m) => m.en.toLowerCase() === normalizedModelEn?.toLowerCase()
-          );
-          if (!modelExists) {
-            makeDoc.models.push({ en: normalizedModelEn || '', ar: normalizedModelAr || '' });
-            await makeDoc.save();
-          }
-        }
-
-        carData.make = makeDoc._id;
-        carData.model = model
-          ? { en: normalizedModelEn || '', ar: normalizedModelAr || '' }
-          : car.model;
-      }
+      return next(new ErrorResponse('Valid make ID is required', 400));
     }
+
+    // Check if the make exists
+    const makeExists = await Make.findById(carData.make);
+    if (!makeExists) {
+      return next(new ErrorResponse('Make not found', 404));
+    }
+  }
+
+  // If model is provided, ensure model.en exists
+  if (carData.model) {
+    if (!carData.model.en) {
+      return next(new ErrorResponse('Model name in English is required when updating model', 400));
+    }
+
+    // Create model object with just en if ar is not provided
+    carData.model = {
+      en: carData.model.en,
+      ar: carData.model.ar || '',
+    };
   }
 
   // Handle image updates if files are uploaded
   if (req.files && req.files.length > 0) {
-    let newImagePaths;
     try {
-      newImagePaths = await Promise.all(
-        req.files.map(async (file, index) => ({
-          url: await processImage(file),
-          main: index === 0,
-        }))
-      );
-    } catch (error) {
-      return next(new ErrorResponse(error.message, 400));
-    }
-
-    if (req.body.replaceImages === 'true') {
-      for (const image of car.images) {
-        try {
-          const filePath = path.join(__dirname, '..', '..', '..', image.url);
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        } catch (error) {
-          console.error('Failed to delete image from local storage:', error);
-        }
-      }
-      carData.images = newImagePaths;
-    } else {
-      const combinedImages = [...car.images, ...newImagePaths];
-      carData.images = combinedImages.map((img, index) => ({
-        url: img.url,
+      const newImagePaths = req.files.map((file, index) => ({
+        url: file.url, // Use the processed URL from middleware
         main: index === 0,
       }));
+
+      if (req.body.replaceImages === 'true') {
+        for (const image of car.images) {
+          try {
+            const filePath = path.join(__dirname, '..', '..', '..', image.url);
+            if (fs.existsSync(filePath)) await fs.promises.unlink(filePath);
+          } catch (error) {
+            console.error('Failed to delete image from local storage:', error);
+          }
+        }
+        carData.images = newImagePaths;
+      } else {
+        const combinedImages = [...car.images, ...newImagePaths];
+        carData.images = combinedImages.map((img, index) => ({
+          url: img.url,
+          main: index === 0,
+        }));
+      }
+    } catch (error) {
+      return next(new ErrorResponse(error.message, 400));
     }
   } else if (carData.images && Array.isArray(carData.images)) {
     carData.images = carData.images.map((img, index) => ({
@@ -298,6 +198,7 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: car });
 });
 
+// Delete a car
 exports.deleteCar = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
   if (!car) return next(new ErrorResponse(messages.notFound, 404));
@@ -305,7 +206,7 @@ exports.deleteCar = asyncHandler(async (req, res, next) => {
   for (const image of car.images) {
     try {
       const filePath = path.join(__dirname, '..', '..', '..', image.url);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      if (fs.existsSync(filePath)) await fs.promises.unlink(filePath);
     } catch (error) {
       console.error('Failed to delete image from local storage:', error);
     }
@@ -314,6 +215,3 @@ exports.deleteCar = asyncHandler(async (req, res, next) => {
   await Car.deleteOne({ _id: req.params.id });
   res.status(200).json({ success: true, message: messages.deleted });
 });
-
-// Export uploadCar for use in routes
-exports.uploadCar = uploadCar;

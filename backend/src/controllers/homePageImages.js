@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs'); // Use promises for async file operations
 const path = require('path');
 const HomePageImages = require('../models/HomePageImages');
 const ErrorResponse = require('../utils/errorResponse');
@@ -14,24 +14,6 @@ const ensureDirectory = () => {
   if (!fs.existsSync(imagesDestDirHome)) {
     fs.mkdirSync(imagesDestDirHome, { recursive: true });
   }
-};
-
-// Utility to validate and move image
-const processImage = (file) => {
-  const fileSizeInMB = file.size / (1024 * 1024);
-  if (fileSizeInMB > 5) {
-    throw new ErrorResponse(
-      {
-        en: `Image ${file.filename} exceeds 5MB limit (${fileSizeInMB.toFixed(2)}MB)`,
-        ar: `الصورة ${file.filename} تتجاوز الحد الأقصى 5MB (${fileSizeInMB.toFixed(2)}MB)`,
-      },
-      400
-    );
-  }
-
-  const destPath = path.join(imagesDestDirHome, file.filename);
-  fs.renameSync(file.path, destPath); // Move file to uploads/home
-  return `/uploads/home/${file.filename}`; // Return relative path
 };
 
 // @desc    Get home page images
@@ -57,7 +39,7 @@ exports.updateHomePageImages = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(messages.contentNotFound, 404));
   }
 
-  // Handle multiple file uploads
+  // Handle file uploads processed by multer and sharp
   if (req.files) {
     const imageFields = ['whatWeDo', 'brands', 'news', 'showroom'];
     const updates = {};
@@ -67,23 +49,17 @@ exports.updateHomePageImages = asyncHandler(async (req, res, next) => {
         // Delete old image from local storage if it exists
         if (homePageImages[field]) {
           try {
-            const oldFilePath = path.join(__dirname, '..', '..', homePageImages[field]);
+            const oldFilePath = path.join(__dirname, '..', '..', '..', homePageImages[field]);
             if (fs.existsSync(oldFilePath)) {
-              fs.unlinkSync(oldFilePath);
-              console.log(
-                `Deleted old ${field} image from local storage: ${homePageImages[field]}`
-              );
+              await fs.promises.unlink(oldFilePath);
+              console.log(`Deleted old ${field} image: ${homePageImages[field]}`);
             }
           } catch (error) {
-            console.error(`Failed to delete ${field} image from local storage:`, error);
+            console.error(`Failed to delete ${field} image:`, error);
           }
         }
-        // Process and move new image
-        try {
-          updates[field] = processImage(req.files[field][0]);
-        } catch (error) {
-          return next(new ErrorResponse(error.message, 400));
-        }
+        // Use the processed file path from multer/sharp
+        updates[field] = `/uploads/home/${req.files[field][0].filename}`;
       }
     }
 

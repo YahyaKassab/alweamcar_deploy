@@ -1,6 +1,5 @@
-const fs = require('fs');
+const fs = require('fs'); // Use promises for async file operations
 const path = require('path');
-const sharp = require('sharp');
 const News = require('../models/News');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/asyncHandler');
@@ -16,33 +15,6 @@ const ensureDirectory = () => {
   if (!fs.existsSync(imagesDestDirNews)) {
     fs.mkdirSync(imagesDestDirNews, { recursive: true });
   }
-};
-
-// Utility to validate and resize image
-const processImage = async (file) => {
-  const fileSizeInMB = file.size / (1024 * 1024);
-  const destPath = path.join(imagesDestDirNews, file.filename);
-
-  if (fileSizeInMB > 1) {
-    const resizedBuffer = await sharp(file.path)
-      .resize({ width: 1200, withoutEnlargement: true })
-      .jpeg({ quality: 80 })
-      .toBuffer();
-
-    const resizedSizeInMB = resizedBuffer.length / (1024 * 1024);
-    if (resizedSizeInMB > 1) {
-      throw new Error(
-        `Image ${file.filename} could not be resized below 1MB (${resizedSizeInMB.toFixed(2)}MB)`
-      );
-    }
-
-    fs.writeFileSync(destPath, resizedBuffer);
-    fs.unlinkSync(file.path); // Remove temp file
-  } else {
-    fs.renameSync(file.path, destPath);
-  }
-
-  return `/uploads/news/${file.filename}`;
 };
 
 // @desc    Get all news with pagination
@@ -97,11 +69,7 @@ exports.createNews = asyncHandler(async (req, res, next) => {
   ensureDirectory();
 
   if (req.file) {
-    try {
-      req.body.image = await processImage(req.file);
-    } catch (error) {
-      return next(new ErrorResponse(error.message, 400));
-    }
+    req.body.image = `/uploads/news/${req.file.filename}`; // Set image URL from multer/sharp
   }
 
   const { title_en, title_ar, details_en, details_ar, brave_en, brave_ar } = req.body;
@@ -137,17 +105,16 @@ exports.updateNews = asyncHandler(async (req, res, next) => {
   if (req.file) {
     if (news.image) {
       try {
-        const oldFilePath = path.join(__dirname, '..', '..', news.image);
-        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
+        const oldFilePath = path.join(__dirname, '..', '..', '..', news.image);
+        if (fs.existsSync(oldFilePath)) {
+          await fs.promises.unlink(oldFilePath);
+          console.log(`Deleted old image: ${news.image}`);
+        }
       } catch (error) {
-        console.error('Failed to delete image from local storage:', error);
+        console.error('Failed to delete old image:', error);
       }
     }
-    try {
-      req.body.image = await processImage(req.file);
-    } catch (error) {
-      return next(new ErrorResponse(error.message, 400));
-    }
+    req.body.image = `/uploads/news/${req.file.filename}`; // Set new image URL from multer/sharp
   }
 
   const updateData = {};
@@ -195,10 +162,13 @@ exports.deleteNews = asyncHandler(async (req, res, next) => {
 
   if (news.image) {
     try {
-      const filePath = path.join(__dirname, '..', '..', news.image);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      const filePath = path.join(__dirname, '..', '..', '..', news.image);
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+        console.log(`Deleted image: ${news.image}`);
+      }
     } catch (error) {
-      console.error('Failed to delete image from local storage:', error);
+      console.error('Failed to delete image:', error);
     }
   }
 

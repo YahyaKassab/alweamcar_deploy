@@ -1,13 +1,13 @@
 const express = require('express');
 const {
-    getSeasonalOffers,
-    getSeasonalOffer,
-    createSeasonalOffer,
-    updateSeasonalOffer,
-    deleteSeasonalOffer,
+  getSeasonalOffers,
+  getSeasonalOffer,
+  createSeasonalOffer,
+  updateSeasonalOffer,
+  deleteSeasonalOffer,
 } = require('../controllers/seasonalOffer');
 const { protect } = require('../middleware/auth');
-const {uploadOffer} = require('../middleware/upload');
+const { uploadOffer } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -77,7 +77,7 @@ router.route('/').get(getSeasonalOffers);
  *         description: Unauthorized (missing or invalid token)
  */
 
-router.route('/').post(protect, uploadOffer.single('image'), createSeasonalOffer);
+router.route('/').post(protect, uploadOffer, createSeasonalOffer);
 
 /**
  * @swagger
@@ -147,7 +147,7 @@ router.route('/:id').get(getSeasonalOffer);
  *       404:
  *         description: Seasonal offer not found
  */
-router.route('/:id').put(protect, uploadOffer.single('image'), updateSeasonalOffer);
+router.route('/:id').put(protect, uploadOffer, updateSeasonalOffer);
 
 /**
  * @swagger

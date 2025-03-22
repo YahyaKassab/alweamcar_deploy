@@ -1,14 +1,30 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
+const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs'); // Synchronous fs for existsSync and mkdirSync
+const fsPromises = require('fs').promises; // Async fs operations
 const ErrorResponse = require('../utils/errorResponse');
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Configure storage for local file system
+const storage = (subfolder) =>
+  multer.diskStorage({
+    destination: function (req, file, cb) {
+      const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'uploads');
+
+      const folder = path.join(uploadsBaseDir, subfolder);
+
+      // Ensure the folder exists
+      if (!fs.existsSync(folder)) {
+        fs.mkdirSync(folder, { recursive: true });
+      }
+
+      cb(null, folder);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
+    },
+  });
 
 // Check file type
 const fileFilter = (req, file, cb) => {
@@ -22,108 +38,79 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure storage for cars
-const storageCar = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Alweam/cars',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [
-      { width: 1200, crop: 'limit' },
-      { quality: 'auto:good' }, // Reduce quality for smaller file size
-      { fetch_format: 'auto' }, // Automatically use the best format (e.g., webp)
-    ],
-  },
-});
-
-// Configure storage for home
-const storageHome = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Alweam/home',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [
-      { width: 1200, crop: 'limit' },
-      { quality: 'auto:good' },
-      { fetch_format: 'auto' },
-    ],
-  },
-});
-
-// Configure storage for offers
-const storageOffer = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Alweam/offers',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [
-      { width: 1200, crop: 'limit' },
-      { quality: 'auto:good' },
-      { fetch_format: 'auto' },
-    ],
-  },
-});
-
-// Configure storage for news
-const storageNews = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Alweam/news',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [
-      { width: 1200, crop: 'limit' },
-      { quality: 'auto:good' },
-      { fetch_format: 'auto' },
-    ],
-  },
-});
-
-// Configure storage for partners
-const storagePartners = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Alweam/partners',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [
-      { width: 1200, crop: 'limit' },
-      { quality: 'auto:good' },
-      { fetch_format: 'auto' },
-    ],
-  },
-});
-
 // Initialize upload middleware
-exports.uploadCar = multer({
-  storage: storageCar,
-  limits: { fileSize: process.env.MAX_FILE_SIZE }, // 2 MB limit
-  fileFilter: fileFilter,
-});
+const upload = (subfolder) =>
+  multer({
+    storage: storage(subfolder),
+    limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 }, // Default to 2MB if not set
+    fileFilter: fileFilter,
+  });
 
-exports.uploadOffer = multer({
-  storage: storageOffer,
-  limits: { fileSize: process.env.MAX_FILE_SIZE }, // 2 MB limit
-  fileFilter: fileFilter,
-});
+// Middleware to process images and set URLs
+const processImage = async (req, res, next) => {
+  if (!req.file && (!req.files || Object.keys(req.files).length === 0)) return next();
 
-exports.uploadHome = multer({
-  storage: storageHome,
-  limits: { fileSize: process.env.MAX_FILE_SIZE }, // 2 MB limit
-  fileFilter: fileFilter,
-}).fields([
+  const processSingleFile = async (file) => {
+    const inputPath = file.path;
+    const tempPath = `${inputPath}.tmp`;
+    // Construct relative URL from the project root
+    const relativeUrl = `/${path
+      .relative(path.join(__dirname, '..', '..', '..'), inputPath)
+      .replace(/\\/g, '/')}`;
+
+    try {
+      await sharp(inputPath)
+        .resize(1200, null, { withoutEnlargement: true }) // Resize width to 1200px, maintain aspect ratio
+        .jpeg({ quality: 80, mozjpeg: true })
+        .png({ quality: 80, compressionLevel: 9 })
+        .webp({ quality: 80 })
+        .toFile(tempPath);
+
+      await fsPromises.rename(tempPath, inputPath);
+      console.log(`Image processed and saved to: ${inputPath}`);
+
+      // Attach the relative URL to the file object
+      file.url = relativeUrl;
+    } catch (err) {
+      console.error('Error processing image:', err);
+      if (fs.existsSync(tempPath)) await fsPromises.unlink(tempPath);
+      return next(new ErrorResponse('Error processing image', 500));
+    }
+  };
+
+  try {
+    if (req.file) {
+      // Single file upload
+      await processSingleFile(req.file);
+    } else if (req.files) {
+      // Multiple file uploads (array or fields)
+      const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+      await Promise.all(files.map(processSingleFile));
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Middleware to handle uploads and processing
+const uploadAndProcessImages = (subfolder, fieldName, maxCount = 1) => {
+  return [
+    maxCount > 1
+      ? upload(subfolder).array(fieldName, maxCount)
+      : upload(subfolder).single(fieldName),
+    processImage,
+  ];
+};
+
+// Export upload middleware
+exports.uploadCar = uploadAndProcessImages('cars', 'images', 10); // For multiple car images (up to 10)
+exports.uploadOffer = uploadAndProcessImages('offers', 'image'); // For single offer image
+exports.uploadHome = upload('home').fields([
   { name: 'whatWeDo', maxCount: 1 },
   { name: 'brands', maxCount: 1 },
   { name: 'news', maxCount: 1 },
   { name: 'showroom', maxCount: 1 },
 ]);
-
-exports.uploadPartner = multer({
-  storage: storagePartners,
-  limits: { fileSize: process.env.MAX_FILE_SIZE }, // 2 MB limit
-  fileFilter: fileFilter,
-});
-
-exports.uploadNews = multer({
-  storage: storageNews,
-  limits: { fileSize: process.env.MAX_FILE_SIZE }, // 2 MB limit
-  fileFilter: fileFilter,
-});
+exports.uploadPartner = uploadAndProcessImages('partners', 'image'); // For single partner image
+exports.uploadNews = uploadAndProcessImages('news', 'image'); // For single news image

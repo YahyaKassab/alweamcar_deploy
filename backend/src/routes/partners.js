@@ -4,9 +4,9 @@ const {
   getPartners,
   updatePartner,
   deletePartner,
-  uploadPartners,
 } = require('../controllers/partner');
 const { protect } = require('../middleware/auth');
+const { uploadPartner } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -64,7 +64,7 @@ const router = express.Router();
  *       401:
  *         description: Not authorized
  */
-router.post('/', protect, uploadPartners.single('image'), createPartner);
+router.post('/', protect, uploadPartner, createPartner);
 
 /**
  * @swagger
@@ -167,7 +167,7 @@ router.get('/', getPartners);
  *       404:
  *         description: Partner not found
  */
-router.put('/:id', protect, uploadPartners.single('image'), updatePartner);
+router.put('/:id', protect, uploadPartner, updatePartner);
 
 /**
  * @swagger

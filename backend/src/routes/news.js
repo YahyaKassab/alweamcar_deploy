@@ -76,7 +76,7 @@ router.route('/').get(getAllNews);
  *       400:
  *         description: Validation error
  */
-router.route('/').post(protect, uploadNews.single('image'), createNews);
+router.route('/').post(protect, uploadNews, createNews);
 
 /**
  * @swagger
@@ -146,7 +146,7 @@ router.route('/:id').get(getNews);
  *       404:
  *         description: News not found
  */
-router.route('/:id').put(protect, uploadNews.single('image'), updateNews);
+router.route('/:id').put(protect, uploadNews, updateNews);
 
 /**
  * @swagger

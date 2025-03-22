@@ -17,7 +17,6 @@ const CarSchema = new mongoose.Schema(
       },
       ar: {
         type: String,
-        required: [true, messages.modelRequired?.ar || 'Model is required'],
         trim: true,
         index: true,
       },
