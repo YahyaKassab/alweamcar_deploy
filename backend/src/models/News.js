@@ -29,7 +29,7 @@ const NewsSchema = new mongoose.Schema({
       },
     },
   ],
-  brave: {
+  preview: {
     en: {
       type: String,
       required: [true, messages.required.en],

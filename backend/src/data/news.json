@@ -22,14 +22,12 @@
         }
       }
     ],
-    "brave": {
+    "preview": {
       "en": "Driving the Future of Mobility",
       "ar": "قيادة مستقبل التنقل"
     },
     "image": "1.jpg",
-    "date": "2024-03-01T08:30:00Z",
-    "createdAt": "2024-03-01T08:30:00Z",
-    "updatedAt": "2024-03-01T08:30:00Z"
+    "date": "2024-03-01T08:30:00Z"
   },
   {
     "content": [
@@ -54,14 +52,12 @@
         }
       }
     ],
-    "brave": {
+    "preview": {
       "en": "Navigating Industry Challenges",
       "ar": "التغلب على تحديات الصناعة"
     },
     "image": "3.jpg",
-    "date": "2024-03-05T12:00:00Z",
-    "createdAt": "2024-03-05T12:00:00Z",
-    "updatedAt": "2024-03-05T12:00:00Z"
+    "date": "2024-03-05T12:00:00Z"
   },
   {
     "content": [
@@ -86,13 +82,11 @@
         }
       }
     ],
-    "brave": {
+    "preview": {
       "en": "Safer Roads Ahead",
       "ar": "طرق أكثر أمانًا في المستقبل"
     },
     "image": "2.jpg",
-    "date": "2024-03-10T09:45:00Z",
-    "createdAt": "2024-03-10T09:45:00Z",
-    "updatedAt": "2024-03-10T09:45:00Z"
+    "date": "2024-03-10T09:45:00Z"
   }
 ]
