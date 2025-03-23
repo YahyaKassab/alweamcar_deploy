@@ -2,7 +2,6 @@ const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs'); // Synchronous fs for existsSync and mkdirSync
-const fsPromises = require('fs').promises; // Async fs operations
 const ErrorResponse = require('../utils/errorResponse');
 
 // Configure storage for local file system
@@ -66,14 +65,14 @@ const processImage = async (req, res, next) => {
         .webp({ quality: 85, lossless: false }) // Quality at 85, lossy mode
         .toFile(tempPath);
 
-      await fsPromises.rename(tempPath, inputPath);
+      await fs.promises.rename(tempPath, inputPath);
       console.log(`Image processed and saved to: ${inputPath}`);
 
       // Attach the relative URL to the file object
       file.url = relativeUrl;
     } catch (err) {
       console.error('Error processing image:', err);
-      if (fs.existsSync(tempPath)) await fsPromises.unlink(tempPath);
+      if (fs.existsSync(tempPath)) await fs.promises.unlink(tempPath);
       return next(
         new ErrorResponse({ en: 'Error processing image', ar: 'خطأ في برمجة الصورة' }, 500)
       );
