@@ -9,7 +9,7 @@ const storage = (subfolder) =>
   multer.diskStorage({
     destination: function (req, file, cb) {
       const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'uploads');
-
+      console.log('uploadsBaseDir: ', uploadsBaseDir);
       const folder = path.join(uploadsBaseDir, subfolder);
 
       // Ensure the folder exists

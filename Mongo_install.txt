@@ -44,8 +44,8 @@ TEST news title, details{html}, brave + about
 
 
 TEST:
-ADMINS
-AUTH
+👍ADMINS
+👍AUTH
 FAQ
 HOME
 MAKES
