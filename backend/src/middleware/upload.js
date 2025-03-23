@@ -43,7 +43,7 @@ const upload = (subfolder) =>
   multer({
     storage: storage(subfolder),
     limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 }, // Default to 2MB if not set
-    fileFilter: fileFilter,
+    fileFilter,
   });
 
 // Middleware to process images and set URLs
@@ -113,6 +113,8 @@ exports.uploadHome = upload('home').fields([
   { name: 'brands', maxCount: 1 },
   { name: 'news', maxCount: 1 },
   { name: 'showroom', maxCount: 1 },
+  { name: 'feedback', maxCount: 1 },
+  { name: 'terms', maxCount: 1 },
 ]);
 exports.uploadPartner = uploadAndProcessImages('partners', 'image'); // For single partner image
 exports.uploadNews = uploadAndProcessImages('news', 'image'); // For single news image

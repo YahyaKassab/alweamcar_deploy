@@ -41,7 +41,7 @@ exports.updateHomePageImages = asyncHandler(async (req, res, next) => {
 
   // Handle file uploads processed by multer and sharp
   if (req.files) {
-    const imageFields = ['whatWeDo', 'brands', 'news', 'showroom'];
+    const imageFields = ['whatWeDo', 'brands', 'news', 'showroom', 'feedback', 'terms'];
     const updates = {};
 
     for (const field of imageFields) {
