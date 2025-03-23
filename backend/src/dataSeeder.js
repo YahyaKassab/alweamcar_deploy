@@ -94,16 +94,16 @@ const seedData = async () => {
   try {
     ensureDirectories();
 
-    console.log('🧹 Clearing old data...');
+    // console.log('🧹 Clearing old data...');
 
     // Delete existing records
-    await Car.deleteMany();
-    await SeasonalOffer.deleteMany();
-    await Feedback.deleteMany();
-    await News.deleteMany();
-    await Make.deleteMany();
-    await FAQ.deleteMany();
-    await Partner.deleteMany();
+    // await Car.deleteMany();
+    // await SeasonalOffer.deleteMany();
+    // await Feedback.deleteMany();
+    // await News.deleteMany();
+    // await Make.deleteMany();
+    // await FAQ.deleteMany();
+    // await Partner.deleteMany();
 
     console.log('🌱 Seeding new data...');
 
