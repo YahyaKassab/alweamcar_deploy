@@ -1,6 +1,6 @@
 const fs = require('fs'); // Use promises for async file operations
 const path = require('path');
-const Partner = require('../models/partner');
+const Partner = require('../models/Partner');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const messages = require('../locales/messages');

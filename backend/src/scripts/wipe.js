@@ -8,7 +8,7 @@ const Feedback = require('../models/Feedback');
 const News = require('../models/News');
 const Make = require('../models/Make');
 const FAQ = require('../models/FAQ');
-const Partner = require('../models/partner');
+const Partner = require('../models/Partner');
 const connectDB = require('../config/database');
 
 // Load environment variables
