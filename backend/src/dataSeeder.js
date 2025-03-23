@@ -116,7 +116,7 @@ const seedData = async () => {
       fs.readFileSync(path.join(__dirname, 'data', 'feedbacks.json'), 'utf-8')
     );
     const news = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'news.json'), 'utf-8'));
-    const makes = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'makes.json'), 'utf-8'));
+    const makes = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'Makes.json'), 'utf-8'));
     const faqs = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'FAQs.json'), 'utf-8'));
     const partners = JSON.parse(
       fs.readFileSync(path.join(__dirname, 'data', 'partners.json'), 'utf-8')
