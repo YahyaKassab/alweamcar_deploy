@@ -45,6 +45,12 @@ const router = express.Router();
  *                     showroom:
  *                       type: string
  *                       description: URL of the Showroom image
+ *                     feedback:
+ *                       type: string
+ *                       description: URL of the Feedback image
+ *                     terms:
+ *                       type: string
+ *                       description: URL of the Terms image
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
@@ -82,6 +88,14 @@ router.route('/').get(getHomePageImages);
  *                 type: string
  *                 format: binary
  *                 description: Image file for Showroom section (max 2MB, jpeg/jpg/png/webp)
+ *               feedback:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file for Feedback section (max 2MB, jpeg/jpg/png/webp)
+ *               terms:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file for Terms section (max 2MB, jpeg/jpg/png/webp)
  *     responses:
  *       200:
  *         description: Home page images updated successfully
@@ -106,6 +120,10 @@ router.route('/').get(getHomePageImages);
  *                     news:
  *                       type: string
  *                     showroom:
+ *                       type: string
+ *                     feedback:
+ *                       type: string
+ *                     terms:
  *                       type: string
  *                     updatedAt:
  *                       type: string
