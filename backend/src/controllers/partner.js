@@ -25,7 +25,7 @@ exports.createPartner = asyncHandler(async (req, res, next) => {
   const { name, url } = req.body;
 
   if (!name || !url) {
-    return next(new ErrorResponse(messages.requiredFieldsMissing, 400));
+    return next(new ErrorResponse(messages.required, 400));
   }
 
   if (!req.file) {

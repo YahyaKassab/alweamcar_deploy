@@ -31,7 +31,7 @@ exports.getFAQ = asyncHandler(async (req, res, next) => {
 
   const faq = await FAQ.findById(req.params.id);
   if (!faq) {
-    let { ar, en } = messages.contentNotFound;
+    let { ar, en } = messages.notFound;
     ar = ar.replace('{id}', req.params.id);
     en = en.replace('{id}', req.params.id);
     return next(new ErrorResponse({ en, ar }, 404));
@@ -72,7 +72,7 @@ exports.updateFAQ = asyncHandler(async (req, res, next) => {
   });
 
   if (!faq) {
-    let { ar, en } = messages.contentNotFound;
+    let { ar, en } = messages.notFound;
     ar = ar.replace('{id}', req.params.id);
     en = en.replace('{id}', req.params.id);
     return next(new ErrorResponse({ en, ar }, 404));
@@ -97,7 +97,7 @@ exports.deleteFAQ = asyncHandler(async (req, res, next) => {
 
   const faq = await FAQ.findById(req.params.id);
   if (!faq) {
-    let { ar, en } = messages.contentNotFound;
+    let { ar, en } = messages.notFound;
     ar = ar.replace('{id}', req.params.id);
     en = en.replace('{id}', req.params.id);
     return next(new ErrorResponse({ en, ar }, 404));
@@ -107,6 +107,6 @@ exports.deleteFAQ = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: messages.contentDeleted,
+    message: messages.deleted,
   });
 });

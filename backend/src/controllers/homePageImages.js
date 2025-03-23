@@ -36,7 +36,7 @@ exports.updateHomePageImages = asyncHandler(async (req, res, next) => {
   let homePageImages = await HomePageImages.getInstance();
 
   if (!homePageImages) {
-    return next(new ErrorResponse(messages.contentNotFound, 404));
+    return next(new ErrorResponse(messages.notFound, 404));
   }
 
   // Handle file uploads processed by multer and sharp
@@ -74,7 +74,7 @@ exports.updateHomePageImages = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: messages.contentUpdated,
+    message: { en: 'Updated', ar: 'تم التحديث' },
     data: homePageImages,
   });
 });

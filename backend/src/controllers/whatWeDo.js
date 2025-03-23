@@ -7,32 +7,32 @@ const messages = require('../locales/messages');
 // @route   GET /api/what-we-do
 // @access  Public
 exports.getWhatWeDo = asyncHandler(async (req, res, next) => {
-    const whatWeDo = await WhatWeDo.getInstance();
+  const whatWeDo = await WhatWeDo.getInstance();
 
-    res.status(200).json({
-        success: true,
-        data: whatWeDo,
-    });
+  res.status(200).json({
+    success: true,
+    data: whatWeDo,
+  });
 });
 
 // @desc    Update what we do content
 // @route   PUT /api/what-we-do
 // @access  Private
 exports.updateWhatWeDo = asyncHandler(async (req, res, next) => {
-    let whatWeDo = await WhatWeDo.getInstance();
+  let whatWeDo = await WhatWeDo.getInstance();
 
-    if (!whatWeDo) {
-        return next(new ErrorResponse(messages.contentNotFound, 404));
-    }
+  if (!whatWeDo) {
+    return next(new ErrorResponse(messages.notFound, 404));
+  }
 
-    whatWeDo = await WhatWeDo.findByIdAndUpdate(whatWeDo._id, req.body, {
-        new: true,
-        runValidators: true,
-    });
+  whatWeDo = await WhatWeDo.findByIdAndUpdate(whatWeDo._id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-    res.status(200).json({
-        success: true,
-        message: messages.contentUpdated,
-        data: whatWeDo,
-    });
+  res.status(200).json({
+    success: true,
+    message: { en: 'Updated successfully', ar: 'تم التحديث بنجاح' },
+    data: whatWeDo,
+  });
 });

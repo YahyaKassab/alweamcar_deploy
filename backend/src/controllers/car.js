@@ -81,18 +81,20 @@ exports.createCar = asyncHandler(async (req, res, next) => {
 
   // Verify make is a valid ObjectId
   if (!carData.make || !isValidObjectId(carData.make)) {
-    return next(new ErrorResponse('Valid make ID is required', 400));
+    return next(
+      new ErrorResponse({ en: 'Valid make ID is required', ar: 'معرف صنف صحيح مطلوب' }, 400)
+    );
   }
 
   // Check if the make exists
   const makeExists = await Make.findById(carData.make);
   if (!makeExists) {
-    return next(new ErrorResponse('Make not found', 404));
+    return next(new ErrorResponse(messages.notFound, 404));
   }
 
   // Ensure model.en is provided
   if (!carData.model?.en) {
-    return next(new ErrorResponse('Model name in English is required', 400));
+    return next(new ErrorResponse(messages.required, 400));
   }
 
   // Create model object with just en if ar is not provided
@@ -132,20 +134,20 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
   // If make is provided, verify it's a valid ObjectId
   if (carData.make) {
     if (!isValidObjectId(carData.make)) {
-      return next(new ErrorResponse('Valid make ID is required', 400));
+      return next(new ErrorResponse(messages.required, 400));
     }
 
     // Check if the make exists
     const makeExists = await Make.findById(carData.make);
     if (!makeExists) {
-      return next(new ErrorResponse('Make not found', 404));
+      return next(new ErrorResponse(messages.notFound, 404));
     }
   }
 
   // If model is provided, ensure model.en exists
   if (carData.model) {
     if (!carData.model.en) {
-      return next(new ErrorResponse('Model name in English is required when updating model', 400));
+      return next(new ErrorResponse(messages.required, 400));
     }
 
     // Create model object with just en if ar is not provided

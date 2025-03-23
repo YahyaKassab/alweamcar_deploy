@@ -47,7 +47,7 @@ exports.getSeasonalOffer = asyncHandler(async (req, res, next) => {
 
   const offer = await SeasonalOffer.findById(req.params.id);
   if (!offer) {
-    let { ar, en } = messages.offerNotFound;
+    let { ar, en } = messages.notFound;
     ar = ar.replace('{id}', req.params.id);
     en = en.replace('{id}', req.params.id);
     return next(new ErrorResponse({ en, ar }, 404));
@@ -99,7 +99,7 @@ exports.updateSeasonalOffer = asyncHandler(async (req, res, next) => {
 
   let offer = await SeasonalOffer.findById(req.params.id);
   if (!offer) {
-    let { ar, en } = messages.offerNotFound;
+    let { ar, en } = messages.notFound;
     ar = ar.replace('{id}', req.params.id);
     en = en.replace('{id}', req.params.id);
     return next(new ErrorResponse({ en, ar }, 404));
@@ -141,7 +141,7 @@ exports.deleteSeasonalOffer = asyncHandler(async (req, res, next) => {
 
   const offer = await SeasonalOffer.findById(req.params.id);
   if (!offer) {
-    let { ar, en } = messages.offerNotFound;
+    let { ar, en } = messages.notFound;
     ar = ar.replace('{id}', req.params.id);
     en = en.replace('{id}', req.params.id);
     return next(new ErrorResponse({ en, ar }, 404));
@@ -160,5 +160,5 @@ exports.deleteSeasonalOffer = asyncHandler(async (req, res, next) => {
   }
 
   await offer.deleteOne();
-  res.status(200).json({ success: true, message: messages.offerDeleted, data: {} });
+  res.status(200).json({ success: true, message: messages.deleted, data: {} });
 });

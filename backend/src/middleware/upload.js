@@ -34,7 +34,7 @@ const fileFilter = (req, file, cb) => {
   if (mimetype) {
     return cb(null, true);
   } else {
-    cb(new ErrorResponse('Only image files are allowed!', 400));
+    cb(new ErrorResponse({ en: 'Only image files are allowed!', ar: 'مسموح بالصور فقط!' }, 400));
   }
 };
 
@@ -74,7 +74,9 @@ const processImage = async (req, res, next) => {
     } catch (err) {
       console.error('Error processing image:', err);
       if (fs.existsSync(tempPath)) await fsPromises.unlink(tempPath);
-      return next(new ErrorResponse('Error processing image', 500));
+      return next(
+        new ErrorResponse({ en: 'Error processing image', ar: 'خطأ في برمجة الصورة' }, 500)
+      );
     }
   };
 

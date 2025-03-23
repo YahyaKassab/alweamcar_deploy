@@ -41,3 +41,19 @@ DONE
 ✔terms list{title, details, order}
 TEST news title, details{html}, brave + about
 ✔SEED ALL OF THIS
+
+
+TEST:
+ADMINS
+AUTH
+FAQ
+HOME
+MAKES
+NEWS
+PARTNERS
+OFFERS
+SOCIAL
+CARS
+FEEDBACKS
+TERMS
+ABOUT

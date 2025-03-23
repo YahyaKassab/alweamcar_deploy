@@ -22,7 +22,7 @@ exports.updateSocial = asyncHandler(async (req, res, next) => {
   let social = await Social.getInstance();
 
   if (!social) {
-    return next(new ErrorResponse(messages.contentNotFound, 404));
+    return next(new ErrorResponse(messages.notFound, 404));
   }
 
   social = await Social.findByIdAndUpdate(social._id, req.body, {
@@ -32,7 +32,10 @@ exports.updateSocial = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: messages.contentUpdated,
+    message: {
+      en: 'Social media and contact info updated successfully',
+      ar: 'تم تحديث الوسائط الاجتماعية ومعلومات الاتصال بنجاح',
+    },
     data: social,
   });
 });

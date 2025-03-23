@@ -22,7 +22,7 @@ exports.updateTermsAndConditions = asyncHandler(async (req, res, next) => {
   let termsAndConditions = await Terms.getInstance();
 
   if (!termsAndConditions) {
-    return next(new ErrorResponse(messages.contentNotFound, 404));
+    return next(new ErrorResponse(messages.notFound, 404));
   }
 
   termsAndConditions = await Terms.findByIdAndUpdate(termsAndConditions._id, req.body, {
@@ -32,7 +32,10 @@ exports.updateTermsAndConditions = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: messages.contentUpdated,
+    message: {
+      en: 'Terms and conditions updated successfully',
+      ar: 'تم تحديث الشروط والاحكام بنجاح',
+    },
     data: termsAndConditions,
   });
 });
