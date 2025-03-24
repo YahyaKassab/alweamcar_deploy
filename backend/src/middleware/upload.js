@@ -1,15 +1,14 @@
 const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
-const fs = require('fs'); // Synchronous fs for existsSync and mkdirSync
+const fs = require('fs');
 const ErrorResponse = require('../utils/errorResponse');
 
 // Configure storage for local file system
 const storage = (subfolder) =>
   multer.diskStorage({
     destination: function (req, file, cb) {
-      const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'uploads');
-      console.log('uploadsBaseDir: ', uploadsBaseDir);
+      const uploadsBaseDir = path.join(__dirname, '..', '..', 'public', 'uploads');
       const folder = path.join(uploadsBaseDir, subfolder);
 
       // Ensure the folder exists
@@ -41,7 +40,7 @@ const fileFilter = (req, file, cb) => {
 const upload = (subfolder) =>
   multer({
     storage: storage(subfolder),
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 }, // Default to 2MB if not set
+    limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 },
     fileFilter,
   });
 
@@ -52,39 +51,35 @@ const processImage = async (req, res, next) => {
   const processSingleFile = async (file) => {
     const inputPath = file.path;
     const tempPath = `${inputPath}.tmp`;
-    // Construct relative URL from the project root
-    const relativeUrl = `/${path
-      .relative(path.join(__dirname, '..', '..', '..'), inputPath)
-      .replace(/\\/g, '/')}`;
+    const subfolder = path.basename(path.dirname(inputPath)); // e.g., 'cars'
+    const filename = path.basename(inputPath);
+    const relativeUrl = `/uploads/${subfolder}/${filename}`;
 
     try {
       await sharp(inputPath)
-        .resize(2400, null, { withoutEnlargement: true }) // Keep width at 2400px, maintain aspect ratio
-        .jpeg({ quality: 85, mozjpeg: false }) // Lower quality to 85, no optimization
-        .png({ quality: 90, compressionLevel: 2 }) // Quality at 90, minimal compression
-        .webp({ quality: 85, lossless: false }) // Quality at 85, lossy mode
+        .resize(2400, null, { withoutEnlargement: true })
+        .jpeg({ quality: 85, mozjpeg: false })
+        .png({ quality: 90, compressionLevel: 2 })
+        .webp({ quality: 85, lossless: false })
         .toFile(tempPath);
 
       await fs.promises.rename(tempPath, inputPath);
       console.log(`Image processed and saved to: ${inputPath}`);
 
-      // Attach the relative URL to the file object
       file.url = relativeUrl;
     } catch (err) {
       console.error('Error processing image:', err);
       if (fs.existsSync(tempPath)) await fs.promises.unlink(tempPath);
       return next(
-        new ErrorResponse({ en: 'Error processing image', ar: 'خطأ في برمجة الصورة' }, 500)
+        new ErrorResponse({ en: 'Error processing image', ar: 'خطأ في معالجة الصورة' }, 500)
       );
     }
   };
 
   try {
     if (req.file) {
-      // Single file upload
       await processSingleFile(req.file);
     } else if (req.files) {
-      // Multiple file uploads (array or fields)
       const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
       await Promise.all(files.map(processSingleFile));
     }
@@ -105,8 +100,8 @@ const uploadAndProcessImages = (subfolder, fieldName, maxCount = 1) => {
 };
 
 // Export upload middleware
-exports.uploadCar = uploadAndProcessImages('cars', 'images', 10); // For multiple car images (up to 10)
-exports.uploadOffer = uploadAndProcessImages('offers', 'image'); // For single offer image
+exports.uploadCar = uploadAndProcessImages('cars', 'images', 10);
+exports.uploadOffer = uploadAndProcessImages('offers', 'image');
 exports.uploadHome = upload('home').fields([
   { name: 'whatWeDo', maxCount: 1 },
   { name: 'brands', maxCount: 1 },
@@ -115,5 +110,5 @@ exports.uploadHome = upload('home').fields([
   { name: 'feedback', maxCount: 1 },
   { name: 'terms', maxCount: 1 },
 ]);
-exports.uploadPartner = uploadAndProcessImages('partners', 'image'); // For single partner image
-exports.uploadNews = uploadAndProcessImages('news', 'image'); // For single news image
+exports.uploadPartner = uploadAndProcessImages('partners', 'image');
+exports.uploadNews = uploadAndProcessImages('news', 'image');

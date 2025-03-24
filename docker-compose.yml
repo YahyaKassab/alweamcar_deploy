@@ -30,7 +30,7 @@ services:
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
-      # - ./uploads:/usr/src/app/public/uploads/images
+      - ./uploads:/usr/src/app/public/uploads # Mount uploads directory
     ports:
       - '5000:5000'
     depends_on:
@@ -57,7 +57,7 @@ services:
     container_name: frontend
     restart: always
     ports:
-      - '80:80' # Maps host port 80 to container port 80 (Nginx inside)
+      - '80:80'
     depends_on:
       - backend
     networks:

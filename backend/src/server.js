@@ -49,6 +49,7 @@ app.use(limiter);
 (async () => {
   await createRootAdmin();
 })();
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // (async () => {
 //     await seedData();
