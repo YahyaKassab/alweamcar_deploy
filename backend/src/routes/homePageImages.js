@@ -137,12 +137,12 @@ router.route('/').get(getHomePageImages);
  *       500:
  *         description: Error processing image
  */
-router.route('/').put(protect, (req, res, next) => {
-  const startTime = Date.now();
-  console.log(`[${new Date().toISOString()}] Starting PUT /api/home-page-images`);
-
-  uploadHome(req, res, (err) => {
-    if (err) return next(err);
+router.route('/').put(
+  protect,
+  ...uploadHome, // Spread the uploadHome array
+  (req, res, next) => {
+    const startTime = Date.now();
+    console.log(`[${new Date().toISOString()}] Starting PUT /api/home-page-images`);
 
     updateHomePageImages(req, res, () => {
       const endTime = Date.now();
@@ -152,7 +152,6 @@ router.route('/').put(protect, (req, res, next) => {
       );
       next();
     });
-  });
-});
-
+  }
+);
 module.exports = router;
