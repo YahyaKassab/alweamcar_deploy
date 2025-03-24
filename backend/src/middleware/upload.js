@@ -40,10 +40,32 @@ const fileFilter = (req, file, cb) => {
 const upload = (subfolder) =>
   multer({
     storage: storage(subfolder),
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 15 * 1024 * 1024 },
+    limits: { fileSize: process.env.MAX_FILE_SIZE || 60 * 1024 * 1024 },
     fileFilter,
   });
+// New middleware to log details after saving files for uploadHome
+const logUploadHome = (req, res, next) => {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    console.log('No files uploaded for home');
+    return next();
+  }
 
+  console.log('Files saved for uploadHome:');
+  Object.keys(req.files).forEach((fieldName) => {
+    req.files[fieldName].forEach((file) => {
+      const details = {
+        fieldName: file.fieldname,
+        originalName: file.originalname,
+        savedPath: file.path,
+        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        url: `/uploads/home/${file.filename}`,
+      };
+      console.log(JSON.stringify(details, null, 2));
+    });
+  });
+
+  next();
+};
 // Middleware to process images and set URLs
 const processImage = async (req, res, next) => {
   if (!req.file && (!req.files || Object.keys(req.files).length === 0)) return next();
@@ -102,13 +124,16 @@ const uploadAndProcessImages = (subfolder, fieldName, maxCount = 1) => {
 // Export upload middleware
 exports.uploadCar = uploadAndProcessImages('cars', 'images', 10);
 exports.uploadOffer = uploadAndProcessImages('offers', 'image');
-exports.uploadHome = upload('home').fields([
-  { name: 'whatWeDo', maxCount: 1 },
-  { name: 'brands', maxCount: 1 },
-  { name: 'news', maxCount: 1 },
-  { name: 'showroom', maxCount: 1 },
-  { name: 'feedback', maxCount: 1 },
-  { name: 'terms', maxCount: 1 },
-]);
+exports.uploadHome = [
+  upload('home').fields([
+    { name: 'whatWeDo', maxCount: 1 },
+    { name: 'brands', maxCount: 1 },
+    { name: 'news', maxCount: 1 },
+    { name: 'showroom', maxCount: 1 },
+    { name: 'feedback', maxCount: 1 },
+    { name: 'terms', maxCount: 1 },
+  ]),
+  logUploadHome, // Add logging middleware
+];
 exports.uploadPartner = uploadAndProcessImages('partners', 'image');
 exports.uploadNews = uploadAndProcessImages('news', 'image');
