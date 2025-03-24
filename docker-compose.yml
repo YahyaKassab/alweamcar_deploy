@@ -50,23 +50,23 @@ services:
         max-size: '10m'
         max-file: '3'
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: frontend
-  #   restart: always
-  #   ports:
-  #     - '80:80'
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - alweam-network
-  #   logging:
-  #     driver: 'json-file'
-  #     options:
-  #       max-size: '10m'
-  #       max-file: '3'
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+    networks:
+      - alweam-network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
 
 networks:
   alweam-network:
