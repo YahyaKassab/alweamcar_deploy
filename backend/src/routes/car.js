@@ -8,9 +8,128 @@ const {
   getSimilarCars,
 } = require('../controllers/car');
 const { protect } = require('../middleware/auth');
-const { uploadCar } = require('../middleware/upload'); // Import uploadCar from uploads.js
+const { uploadCar } = require('../middleware/upload');
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Car:
+ *       type: object
+ *       required:
+ *         - make
+ *         - model
+ *         - year
+ *         - condition
+ *         - mileage
+ *         - stockNumber
+ *         - name
+ *         - price
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated ID of the car
+ *         make:
+ *           type: string
+ *           description: Reference to the Make model
+ *         model:
+ *           type: object
+ *           properties:
+ *             en:
+ *               type: string
+ *               description: English model name
+ *             ar:
+ *               type: string
+ *               description: Arabic model name
+ *         year:
+ *           type: integer
+ *           description: Manufacturing year
+ *         condition:
+ *           type: string
+ *           enum: [Brand New, Elite Approved]
+ *           description: Condition of the car
+ *         mileage:
+ *           type: number
+ *           description: Mileage in kilometers
+ *         stockNumber:
+ *           type: string
+ *           description: Unique stock number
+ *         exteriorColor:
+ *           type: object
+ *           properties:
+ *             en:
+ *               type: string
+ *               description: English exterior color
+ *             ar:
+ *               type: string
+ *               description: Arabic exterior color
+ *         interiorColor:
+ *           type: object
+ *           properties:
+ *             en:
+ *               type: string
+ *               description: English interior color
+ *             ar:
+ *               type: string
+ *               description: Arabic interior color
+ *         engine:
+ *           type: object
+ *           properties:
+ *             en:
+ *               type: string
+ *               description: English engine description
+ *             ar:
+ *               type: string
+ *               description: Arabic engine description
+ *         bhp:
+ *           type: object
+ *           properties:
+ *             en:
+ *               type: string
+ *               description: English brake horsepower
+ *             ar:
+ *               type: string
+ *               description: Arabic brake horsepower
+ *         door:
+ *           type: integer
+ *           description: Number of doors
+ *         warranty:
+ *           type: boolean
+ *           description: Warranty status
+ *         name:
+ *           type: object
+ *           properties:
+ *             en:
+ *               type: string
+ *               description: English car name
+ *             ar:
+ *               type: string
+ *               description: Arabic car name
+ *         price:
+ *           type: number
+ *           description: Price in currency
+ *         images:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               url:
+ *                 type: string
+ *                 description: URL of the image
+ *               main:
+ *                 type: boolean
+ *                 description: Whether this is the main image
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date the car was created
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date the car was last updated
+ */
 
 /**
  * @swagger
@@ -121,6 +240,8 @@ router.get('/:id/similar', getSimilarCars);
  *   post:
  *     summary: Create a new car
  *     tags: [Cars]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -137,14 +258,15 @@ router.get('/:id/similar', getSimilarCars);
  *               - name[en]
  *               - name[ar]
  *               - price
+ *               - images
  *             properties:
  *               make:
  *                 type: string
  *                 description: Make ID (reference to an existing Make)
- *               model[en]:
+ *               'model[en]':
  *                 type: string
  *                 description: English model name
- *               model[ar]:
+ *               'model[ar]':
  *                 type: string
  *                 description: Arabic model name (optional)
  *               year:
@@ -160,28 +282,28 @@ router.get('/:id/similar', getSimilarCars);
  *               stockNumber:
  *                 type: string
  *                 description: Unique stock number
- *               exteriorColor[en]:
+ *               'exteriorColor[en]':
  *                 type: string
  *                 description: English exterior color
- *               exteriorColor[ar]:
+ *               'exteriorColor[ar]':
  *                 type: string
  *                 description: Arabic exterior color
- *               interiorColor[en]:
+ *               'interiorColor[en]':
  *                 type: string
  *                 description: English interior color
- *               interiorColor[ar]:
+ *               'interiorColor[ar]':
  *                 type: string
  *                 description: Arabic interior color
- *               engine[en]:
+ *               'engine[en]':
  *                 type: string
  *                 description: English engine description
- *               engine[ar]:
+ *               'engine[ar]':
  *                 type: string
  *                 description: Arabic engine description
- *               bhp[en]:
+ *               'bhp[en]':
  *                 type: string
  *                 description: English brake horsepower
- *               bhp[ar]:
+ *               'bhp[ar]':
  *                 type: string
  *                 description: Arabic brake horsepower
  *               door:
@@ -190,10 +312,10 @@ router.get('/:id/similar', getSimilarCars);
  *               warranty:
  *                 type: boolean
  *                 description: Warranty status
- *               name[en]:
+ *               'name[en]':
  *                 type: string
  *                 description: English car name
- *               name[ar]:
+ *               'name[ar]':
  *                 type: string
  *                 description: Arabic car name
  *               price:
@@ -204,7 +326,7 @@ router.get('/:id/similar', getSimilarCars);
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: Array of image files (select multiple files from file explorer)
+ *                 description: Array of image files (must include exactly one main image)
  *     responses:
  *       201:
  *         description: Car created successfully
@@ -257,6 +379,8 @@ router.route('/').get(getCars).post(protect, uploadCar, createCar);
  *   put:
  *     summary: Update a car
  *     tags: [Cars]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -274,10 +398,10 @@ router.route('/').get(getCars).post(protect, uploadCar, createCar);
  *               make:
  *                 type: string
  *                 description: Make ID (reference to an existing Make)
- *               model[en]:
+ *               'model[en]':
  *                 type: string
  *                 description: English model name
- *               model[ar]:
+ *               'model[ar]':
  *                 type: string
  *                 description: Arabic model name (optional)
  *               year:
@@ -293,28 +417,28 @@ router.route('/').get(getCars).post(protect, uploadCar, createCar);
  *               stockNumber:
  *                 type: string
  *                 description: Unique stock number
- *               exteriorColor[en]:
+ *               'exteriorColor[en]':
  *                 type: string
  *                 description: English exterior color
- *               exteriorColor[ar]:
+ *               'exteriorColor[ar]':
  *                 type: string
  *                 description: Arabic exterior color
- *               interiorColor[en]:
+ *               'interiorColor[en]':
  *                 type: string
  *                 description: English interior color
- *               interiorColor[ar]:
+ *               'interiorColor[ar]':
  *                 type: string
  *                 description: Arabic interior color
- *               engine[en]:
+ *               'engine[en]':
  *                 type: string
  *                 description: English engine description
- *               engine[ar]:
+ *               'engine[ar]':
  *                 type: string
  *                 description: Arabic engine description
- *               bhp[en]:
+ *               'bhp[en]':
  *                 type: string
  *                 description: English brake horsepower
- *               bhp[ar]:
+ *               'bhp[ar]':
  *                 type: string
  *                 description: Arabic brake horsepower
  *               door:
@@ -323,10 +447,10 @@ router.route('/').get(getCars).post(protect, uploadCar, createCar);
  *               warranty:
  *                 type: boolean
  *                 description: Warranty status
- *               name[en]:
+ *               'name[en]':
  *                 type: string
  *                 description: English car name
- *               name[ar]:
+ *               'name[ar]':
  *                 type: string
  *                 description: Arabic car name
  *               price:
@@ -337,10 +461,11 @@ router.route('/').get(getCars).post(protect, uploadCar, createCar);
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: Array of image files (select multiple files from file explorer)
+ *                 description: Array of image files (must include exactly one main image if replacing)
  *               replaceImages:
  *                 type: string
  *                 enum: ['true', 'false']
+ *                 default: 'false'
  *                 description: Whether to replace existing images or add to them
  *     responses:
  *       200:
@@ -364,6 +489,8 @@ router.route('/').get(getCars).post(protect, uploadCar, createCar);
  *   delete:
  *     summary: Delete a car
  *     tags: [Cars]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
