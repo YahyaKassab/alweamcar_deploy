@@ -4,18 +4,15 @@ const path = require('path');
 const fs = require('fs');
 const ErrorResponse = require('../utils/errorResponse');
 
-// Configure storage for local file system
+// Configure storage with debug
 const storage = (subfolder) =>
   multer.diskStorage({
     destination: function (req, file, cb) {
       const uploadsBaseDir = path.join(__dirname, '..', '..', 'public', 'uploads');
       const folder = path.join(uploadsBaseDir, subfolder);
-
-      // Ensure the folder exists
       if (!fs.existsSync(folder)) {
         fs.mkdirSync(folder, { recursive: true });
       }
-
       console.log(`[${new Date().toISOString()}] Storage destination set: ${folder}`);
       cb(null, folder);
     },
@@ -29,11 +26,10 @@ const storage = (subfolder) =>
     },
   });
 
-// Check file type
+// File filter with debug
 const fileFilter = (req, file, cb) => {
   const filetypes = /jpeg|jpg|png|webp/;
   const mimetype = filetypes.test(file.mimetype);
-
   if (mimetype) {
     console.log(`[${new Date().toISOString()}] File type accepted: ${file.mimetype}`);
     cb(null, true);
@@ -43,15 +39,33 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Initialize upload middleware
-const upload = (subfolder) =>
-  multer({
+// Initialize upload with timing wrapper
+const upload = (subfolder) => {
+  const multerInstance = multer({
     storage: storage(subfolder),
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 }, // Default 2MB
+    limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 },
     fileFilter,
   });
 
-// Middleware to process images in parallel and set URLs
+  return (req, res, next) => {
+    const startTime = Date.now();
+    console.log(`[${new Date().toISOString()}] Starting Multer upload for ${subfolder}`);
+    multerInstance(req, res, (err) => {
+      if (err) {
+        console.error(`[${new Date().toISOString()}] Multer error: ${err.message}`);
+        return next(err);
+      }
+      const endTime = Date.now();
+      console.log(
+        `[${new Date().toISOString()}] Multer upload for ${subfolder} completed, ` +
+          `Time: ${(endTime - startTime) / 1000} seconds`
+      );
+      next();
+    });
+  };
+};
+
+// Process images in parallel with debug
 const processImage = async (req, res, next) => {
   const startTime = Date.now();
   console.log(`[${new Date().toISOString()}] Starting image processing`);
@@ -100,29 +114,24 @@ const processImage = async (req, res, next) => {
 
   try {
     if (req.file) {
-      // Single file upload
       await processSingleFile(req.file);
     } else if (req.files) {
-      // Multiple files (array or fields)
       const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
       console.log(`[${new Date().toISOString()}] Processing ${files.length} files in parallel`);
       await Promise.all(files.map(processSingleFile));
     }
-
     const endTime = Date.now();
     console.log(
-      `[${new Date().toISOString()}] Image processing completed, Total time: ${
-        (endTime - startTime) / 1000
-      } seconds`
+      `[${new Date().toISOString()}] Image processing completed, ` +
+        `Total time: ${(endTime - startTime) / 1000} seconds`
     );
     next();
   } catch (err) {
-    console.error(`[${new Date().toISOString()}] Processing failed:`, err.message);
     next(new ErrorResponse({ en: 'Error processing image', ar: 'خطأ في معالجة الصورة' }, 500));
   }
 };
 
-// Middleware for uploadHome with logging (no Sharp processing, just saving)
+// Log uploadHome with full timing
 const logUploadHome = async (req, res, next) => {
   const startTime = Date.now();
   console.log(`[${new Date().toISOString()}] Starting uploadHome`);
@@ -147,37 +156,25 @@ const logUploadHome = async (req, res, next) => {
 
   const endTime = Date.now();
   console.log(
-    `[${new Date().toISOString()}] uploadHome completed, Total time: ${
-      (endTime - startTime) / 1000
-    } seconds`
+    `[${new Date().toISOString()}] uploadHome completed, ` +
+      `Total time: ${(endTime - startTime) / 1000} seconds`
   );
   next();
 };
 
-// Middleware to handle uploads and processing
+// Upload and process with timing
 const uploadAndProcessImages = (subfolder, fieldName, maxCount = 1) => {
-  const startTime = Date.now();
-  console.log(`[${new Date().toISOString()}] Starting upload for ${subfolder}/${fieldName}`);
-
-  const middleware = [
-    maxCount > 1
-      ? upload(subfolder).array(fieldName, maxCount)
-      : upload(subfolder).single(fieldName),
+  return [
+    upload(subfolder)(
+      maxCount > 1
+        ? upload(subfolder).array(fieldName, maxCount)
+        : upload(subfolder).single(fieldName)
+    ),
     processImage,
-    (req, res, next) => {
-      const endTime = Date.now();
-      console.log(
-        `[${new Date().toISOString()}] Upload and processing for ${subfolder}/${fieldName} completed, ` +
-          `Total time: ${(endTime - startTime) / 1000} seconds`
-      );
-      next();
-    },
   ];
-
-  return middleware;
 };
 
-// Export upload middleware
+// Export middleware
 exports.uploadCar = uploadAndProcessImages('cars', 'images', 10);
 exports.uploadOffer = uploadAndProcessImages('offers', 'image');
 exports.uploadHome = [
