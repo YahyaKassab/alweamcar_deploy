@@ -39,25 +39,27 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Initialize upload with timing wrapper
-const upload = (subfolder) => {
-  const multerInstance = multer({
+// Initialize upload as a Multer instance
+const upload = (subfolder) =>
+  multer({
     storage: storage(subfolder),
     limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 },
     fileFilter,
   });
 
+// Timing wrapper middleware
+const withTiming = (uploadFn, label) => {
   return (req, res, next) => {
     const startTime = Date.now();
-    console.log(`[${new Date().toISOString()}] Starting Multer upload for ${subfolder}`);
-    multerInstance(req, res, (err) => {
+    console.log(`[${new Date().toISOString()}] Starting ${label}`);
+    uploadFn(req, res, (err) => {
       if (err) {
-        console.error(`[${new Date().toISOString()}] Multer error: ${err.message}`);
+        console.error(`[${new Date().toISOString()}] ${label} error: ${err.message}`);
         return next(err);
       }
       const endTime = Date.now();
       console.log(
-        `[${new Date().toISOString()}] Multer upload for ${subfolder} completed, ` +
+        `[${new Date().toISOString()}] ${label} completed, ` +
           `Time: ${(endTime - startTime) / 1000} seconds`
       );
       next();
@@ -164,12 +166,13 @@ const logUploadHome = async (req, res, next) => {
 
 // Upload and process with timing
 const uploadAndProcessImages = (subfolder, fieldName, maxCount = 1) => {
+  const uploadMiddleware =
+    maxCount > 1
+      ? upload(subfolder).array(fieldName, maxCount)
+      : upload(subfolder).single(fieldName);
+
   return [
-    upload(subfolder)(
-      maxCount > 1
-        ? upload(subfolder).array(fieldName, maxCount)
-        : upload(subfolder).single(fieldName)
-    ),
+    withTiming(uploadMiddleware, `Multer upload for ${subfolder}/${fieldName}`),
     processImage,
   ];
 };
@@ -178,14 +181,17 @@ const uploadAndProcessImages = (subfolder, fieldName, maxCount = 1) => {
 exports.uploadCar = uploadAndProcessImages('cars', 'images', 10);
 exports.uploadOffer = uploadAndProcessImages('offers', 'image');
 exports.uploadHome = [
-  upload('home').fields([
-    { name: 'whatWeDo', maxCount: 1 },
-    { name: 'brands', maxCount: 1 },
-    { name: 'news', maxCount: 1 },
-    { name: 'showroom', maxCount: 1 },
-    { name: 'feedback', maxCount: 1 },
-    { name: 'terms', maxCount: 1 },
-  ]),
+  withTiming(
+    upload('home').fields([
+      { name: 'whatWeDo', maxCount: 1 },
+      { name: 'brands', maxCount: 1 },
+      { name: 'news', maxCount: 1 },
+      { name: 'showroom', maxCount: 1 },
+      { name: 'feedback', maxCount: 1 },
+      { name: 'terms', maxCount: 1 },
+    ]),
+    'Multer upload for home'
+  ),
   logUploadHome,
 ];
 exports.uploadPartner = uploadAndProcessImages('partners', 'image');
