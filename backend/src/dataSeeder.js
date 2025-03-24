@@ -16,7 +16,8 @@ require('dotenv').config();
 const imagesSourceDirCars = path.join(__dirname, 'data/images/cars');
 const imagesSourceDirOffers = path.join(__dirname, 'data/images/offers');
 const imagesSourceDirPartners = path.join(__dirname, 'data/images/cars');
-const uploadsBaseDir = path.join(__dirname, '..', '..', 'uploads');
+// Updated to match volume mount in docker-compose.yml
+const uploadsBaseDir = path.join(__dirname, '..', '..', 'public', 'uploads');
 const imagesDestDirCars = path.join(uploadsBaseDir, 'cars');
 const imagesDestDirOffers = path.join(uploadsBaseDir, 'offers');
 const imagesDestDirNews = path.join(uploadsBaseDir, 'news');
@@ -94,17 +95,6 @@ const seedData = async () => {
   try {
     ensureDirectories();
 
-    // console.log('🧹 Clearing old data...');
-
-    // Delete existing records
-    // await Car.deleteMany();
-    // await SeasonalOffer.deleteMany();
-    // await Feedback.deleteMany();
-    // await News.deleteMany();
-    // await Make.deleteMany();
-    // await FAQ.deleteMany();
-    // await Partner.deleteMany();
-
     console.log('🌱 Seeding new data...');
 
     // Load data from JSON files
@@ -152,7 +142,6 @@ const seedData = async () => {
     // Process news images
     for (const article of news) {
       if (article.image) {
-        const sourcePath = path.join(imagesSourceDirCars, article.image); // Adjust if news has its own dir
         article.image = await copyImageLocally({ url: article.image }, imagesDestDirNews, 'news');
         if (article.image) article.image = article.image.url; // News expects a string
       } else {
@@ -164,7 +153,6 @@ const seedData = async () => {
     // Process offer images
     for (const offer of offers) {
       if (offer.image) {
-        const sourcePath = path.join(imagesSourceDirOffers, offer.image);
         offer.image = await copyImageLocally({ url: offer.image }, imagesDestDirOffers, 'offers');
         if (offer.image) offer.image = offer.image.url; // Offers expects a string
       } else {
@@ -176,7 +164,6 @@ const seedData = async () => {
     // Process partner images
     for (const partner of partners) {
       if (partner.image) {
-        const sourcePath = path.join(imagesSourceDirPartners, partner.image);
         partner.image = await copyImageLocally(
           { url: partner.image },
           imagesDestDirPartners,

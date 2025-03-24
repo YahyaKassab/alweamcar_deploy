@@ -14,8 +14,8 @@ const connectDB = require('../config/database');
 // Load environment variables
 dotenv.config();
 
-// Set image directories
-const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'uploads');
+// Set image directories - updated to match volume mount
+const uploadsBaseDir = path.join(__dirname, '..', '..', '..', 'public', 'uploads');
 const imagesDestDirCars = path.join(uploadsBaseDir, 'cars');
 const imagesDestDirOffers = path.join(uploadsBaseDir, 'offers');
 const imagesDestDirNews = path.join(uploadsBaseDir, 'news');

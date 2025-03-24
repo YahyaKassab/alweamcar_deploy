@@ -40,7 +40,7 @@ const fileFilter = (req, file, cb) => {
 const upload = (subfolder) =>
   multer({
     storage: storage(subfolder),
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 10 * 1024 * 1024 },
+    limits: { fileSize: process.env.MAX_FILE_SIZE || 15 * 1024 * 1024 },
     fileFilter,
   });
 
