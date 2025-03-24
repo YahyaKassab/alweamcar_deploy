@@ -16,11 +16,16 @@ const storage = (subfolder) =>
         fs.mkdirSync(folder, { recursive: true });
       }
 
+      console.log(`[${new Date().toISOString()}] Storage destination set: ${folder}`);
       cb(null, folder);
     },
     filename: function (req, file, cb) {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
+      const filename = `${uniqueSuffix}${path.extname(file.originalname)}`;
+      console.log(
+        `[${new Date().toISOString()}] Filename generated: ${filename} for ${file.originalname}`
+      );
+      cb(null, filename);
     },
   });
 
@@ -30,8 +35,10 @@ const fileFilter = (req, file, cb) => {
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype) {
-    return cb(null, true);
+    console.log(`[${new Date().toISOString()}] File type accepted: ${file.mimetype}`);
+    cb(null, true);
   } else {
+    console.log(`[${new Date().toISOString()}] File type rejected: ${file.mimetype}`);
     cb(new ErrorResponse({ en: 'Only image files are allowed!', ar: 'مسموح بالصور فقط!' }, 400));
   }
 };
@@ -40,40 +47,27 @@ const fileFilter = (req, file, cb) => {
 const upload = (subfolder) =>
   multer({
     storage: storage(subfolder),
-    limits: { fileSize: process.env.MAX_FILE_SIZE || 60 * 1024 * 1024 },
+    limits: { fileSize: process.env.MAX_FILE_SIZE || 2 * 1024 * 1024 }, // Default 2MB
     fileFilter,
   });
-// New middleware to log details after saving files for uploadHome
-const logUploadHome = (req, res, next) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    console.log('No files uploaded for home');
+
+// Middleware to process images in parallel and set URLs
+const processImage = async (req, res, next) => {
+  const startTime = Date.now();
+  console.log(`[${new Date().toISOString()}] Starting image processing`);
+
+  if (!req.file && (!req.files || Object.keys(req.files).length === 0)) {
+    console.log(`[${new Date().toISOString()}] No files to process`);
     return next();
   }
 
-  console.log('Files saved for uploadHome:');
-  Object.keys(req.files).forEach((fieldName) => {
-    req.files[fieldName].forEach((file) => {
-      const details = {
-        fieldName: file.fieldname,
-        originalName: file.originalname,
-        savedPath: file.path,
-        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-        url: `/uploads/home/${file.filename}`,
-      };
-      console.log(JSON.stringify(details, null, 2));
-    });
-  });
-
-  next();
-};
-// Middleware to process images and set URLs
-const processImage = async (req, res, next) => {
-  if (!req.file && (!req.files || Object.keys(req.files).length === 0)) return next();
-
   const processSingleFile = async (file) => {
+    const fileStartTime = Date.now();
+    console.log(`[${new Date().toISOString()}] Processing file: ${file.originalname}`);
+
     const inputPath = file.path;
     const tempPath = `${inputPath}.tmp`;
-    const subfolder = path.basename(path.dirname(inputPath)); // e.g., 'cars'
+    const subfolder = path.basename(path.dirname(inputPath));
     const filename = path.basename(inputPath);
     const relativeUrl = `/uploads/${subfolder}/${filename}`;
 
@@ -86,39 +80,101 @@ const processImage = async (req, res, next) => {
         .toFile(tempPath);
 
       await fs.promises.rename(tempPath, inputPath);
-      console.log(`Image processed and saved to: ${inputPath}`);
-
       file.url = relativeUrl;
-    } catch (err) {
-      console.error('Error processing image:', err);
-      if (fs.existsSync(tempPath)) await fs.promises.unlink(tempPath);
-      return next(
-        new ErrorResponse({ en: 'Error processing image', ar: 'خطأ في معالجة الصورة' }, 500)
+
+      const fileEndTime = Date.now();
+      console.log(
+        `[${new Date().toISOString()}] File processed and saved: ${inputPath}, ` +
+          `Size: ${(file.size / 1024 / 1024).toFixed(2)} MB, ` +
+          `Time: ${(fileEndTime - fileStartTime) / 1000} seconds`
       );
+    } catch (err) {
+      console.error(
+        `[${new Date().toISOString()}] Error processing ${file.originalname}:`,
+        err.message
+      );
+      if (fs.existsSync(tempPath)) await fs.promises.unlink(tempPath);
+      throw err;
     }
   };
 
   try {
     if (req.file) {
+      // Single file upload
       await processSingleFile(req.file);
     } else if (req.files) {
+      // Multiple files (array or fields)
       const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+      console.log(`[${new Date().toISOString()}] Processing ${files.length} files in parallel`);
       await Promise.all(files.map(processSingleFile));
     }
+
+    const endTime = Date.now();
+    console.log(
+      `[${new Date().toISOString()}] Image processing completed, Total time: ${
+        (endTime - startTime) / 1000
+      } seconds`
+    );
     next();
   } catch (err) {
-    next(err);
+    console.error(`[${new Date().toISOString()}] Processing failed:`, err.message);
+    next(new ErrorResponse({ en: 'Error processing image', ar: 'خطأ في معالجة الصورة' }, 500));
   }
+};
+
+// Middleware for uploadHome with logging (no Sharp processing, just saving)
+const logUploadHome = async (req, res, next) => {
+  const startTime = Date.now();
+  console.log(`[${new Date().toISOString()}] Starting uploadHome`);
+
+  if (!req.files || Object.keys(req.files).length === 0) {
+    console.log(`[${new Date().toISOString()}] No files uploaded for home`);
+    return next();
+  }
+
+  console.log(`[${new Date().toISOString()}] Files saved for uploadHome:`);
+  const files = Object.values(req.files).flat();
+  files.forEach((file) => {
+    const details = {
+      fieldName: file.fieldname,
+      originalName: file.originalname,
+      savedPath: file.path,
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+      url: `/uploads/home/${file.filename}`,
+    };
+    console.log(JSON.stringify(details, null, 2));
+  });
+
+  const endTime = Date.now();
+  console.log(
+    `[${new Date().toISOString()}] uploadHome completed, Total time: ${
+      (endTime - startTime) / 1000
+    } seconds`
+  );
+  next();
 };
 
 // Middleware to handle uploads and processing
 const uploadAndProcessImages = (subfolder, fieldName, maxCount = 1) => {
-  return [
+  const startTime = Date.now();
+  console.log(`[${new Date().toISOString()}] Starting upload for ${subfolder}/${fieldName}`);
+
+  const middleware = [
     maxCount > 1
       ? upload(subfolder).array(fieldName, maxCount)
       : upload(subfolder).single(fieldName),
     processImage,
+    (req, res, next) => {
+      const endTime = Date.now();
+      console.log(
+        `[${new Date().toISOString()}] Upload and processing for ${subfolder}/${fieldName} completed, ` +
+          `Total time: ${(endTime - startTime) / 1000} seconds`
+      );
+      next();
+    },
   ];
+
+  return middleware;
 };
 
 // Export upload middleware
@@ -133,7 +189,7 @@ exports.uploadHome = [
     { name: 'feedback', maxCount: 1 },
     { name: 'terms', maxCount: 1 },
   ]),
-  logUploadHome, // Add logging middleware
+  logUploadHome,
 ];
 exports.uploadPartner = uploadAndProcessImages('partners', 'image');
 exports.uploadNews = uploadAndProcessImages('news', 'image');
