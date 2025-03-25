@@ -79,19 +79,6 @@ router.post('/', protect, createMake);
  *   get:
  *     summary: Get all makes with pagination
  *     tags: [Makes]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Page number for pagination
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Number of items per page
  *     responses:
  *       200:
  *         description: A list of makes

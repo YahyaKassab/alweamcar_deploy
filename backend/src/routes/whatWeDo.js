@@ -25,29 +25,27 @@ const router = express.Router();
  *                 data:
  *                   type: object
  *                   properties:
- *                     content:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           title:
- *                             type: object
- *                             properties:
- *                               en:
- *                                 type: string
- *                                 example: "Default Title in English"
- *                               ar:
- *                                 type: string
- *                                 example: "العنوان الافتراضي بالعربية"
- *                           details:
- *                             type: object
- *                             properties:
- *                               en:
- *                                 type: string
- *                                 example: "Default details in English."
- *                               ar:
- *                                 type: string
- *                                 example: "تفاصيل افتراضية بالعربية."
+ *                     title:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                           example: "Default Title in English"
+ *                         ar:
+ *                           type: string
+ *                           example: "العنوان الافتراضي بالعربية"
+ *                     details:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                           example: "Default details in English."
+ *                         ar:
+ *                           type: string
+ *                           example: "تفاصيل افتراضية بالعربية."
+ *                     image:
+ *                       type: string
+ *                       example: "https://example.com/image.jpg"
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
@@ -65,9 +63,39 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               content:
- *                 type: array
- *                 items:
+ *               title:
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     example: "Updated Title in English"
+ *                   ar:
+ *                     type: string
+ *                     example: "العنوان المحدث بالعربية"
+ *               details:
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     example: "Updated details in English."
+ *                   ar:
+ *                     type: string
+ *                     example: "التفاصيل المحدثة بالعربية."
+ *               image:
+ *                 type: string
+ *                 example: "https://example.com/updated-image.jpg"
+ *     responses:
+ *       200:
+ *         description: Successfully updated content
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
  *                   type: object
  *                   properties:
  *                     title:
@@ -88,45 +116,9 @@ const router = express.Router();
  *                         ar:
  *                           type: string
  *                           example: "التفاصيل المحدثة بالعربية."
- *             required:
- *               - content
- *     responses:
- *       200:
- *         description: Successfully updated content
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     content:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           title:
- *                             type: object
- *                             properties:
- *                               en:
- *                                 type: string
- *                                 example: "Updated Title in English"
- *                               ar:
- *                                 type: string
- *                                 example: "العنوان المحدث بالعربية"
- *                           details:
- *                             type: object
- *                             properties:
- *                               en:
- *                                 type: string
- *                                 example: "Updated details in English."
- *                               ar:
- *                                 type: string
- *                                 example: "التفاصيل المحدثة بالعربية."
+ *                     image:
+ *                       type: string
+ *                       example: "https://example.com/updated-image.jpg"
  *                     updatedAt:
  *                       type: string
  *                       format: date-time

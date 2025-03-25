@@ -2,32 +2,29 @@ const mongoose = require('mongoose');
 const messages = require('../locales/messages');
 
 const WhatWeDoSchema = new mongoose.Schema({
-  content: [
-    {
-      title: {
-        en: {
-          type: String,
-          required: [true, messages.titleRequired.en],
-          trim: true,
-        },
-        ar: {
-          type: String,
-          required: [true, messages.titleRequired.ar],
-          trim: true,
-        },
-      },
-      details: {
-        en: {
-          type: String,
-          required: [true, messages.detailsRequired.en],
-        },
-        ar: {
-          type: String,
-          required: [true, messages.detailsRequired.ar],
-        },
-      },
+  title: {
+    en: {
+      type: String,
+      required: [true, messages.titleRequired.en],
+      trim: true,
     },
-  ],
+    ar: {
+      type: String,
+      required: [true, messages.titleRequired.ar],
+      trim: true,
+    },
+  },
+  details: {
+    en: {
+      type: String,
+      required: [true, messages.detailsRequired.en],
+    },
+    ar: {
+      type: String,
+      required: [true, messages.detailsRequired.ar],
+    },
+  },
+  image: String,
   updatedAt: {
     type: Date,
     default: Date.now,
@@ -45,18 +42,15 @@ WhatWeDoSchema.statics.getInstance = async function () {
   let instance = await this.findOne();
   if (!instance) {
     instance = await this.create({
-      content: [
-        {
-          title: {
-            en: 'Default Title in English',
-            ar: 'العنوان الافتراضي بالعربية',
-          },
-          details: {
-            en: 'Default details in English.',
-            ar: 'تفاصيل افتراضية بالعربية.',
-          },
-        },
-      ],
+      title: {
+        en: 'Default Title in English',
+        ar: 'العنوان الافتراضي بالعربية',
+      },
+      details: {
+        en: 'Default details in English.',
+        ar: 'تفاصيل افتراضية بالعربية.',
+      },
+      image: '/uploads/home/whatwedo.jpg',
     });
   }
   return instance;

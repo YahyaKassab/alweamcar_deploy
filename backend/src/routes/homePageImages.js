@@ -139,7 +139,7 @@ router.route('/').get(getHomePageImages);
  */
 router.route('/').put(
   protect,
-  ...uploadHome, // Spread the uploadHome array
+  uploadHome, // Spread the uploadHome array
   (req, res, next) => {
     const startTime = Date.now();
     console.log(`[${new Date().toISOString()}] Starting PUT /api/home-page-images`);
