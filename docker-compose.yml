@@ -12,8 +12,8 @@ services:
     networks:
       - alweam-network
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_ROOT_USERNAME=fadi
+      - MONGO_INITDB_ROOT_PASSWORD=MIIC2jCCAcICAQAwgZQxCzAJBgNVBAYTAkFFMRIwEAYDVQQIDAlBYnUgRGhhYmkx
       - MONGO_INITDB_DATABASE=car-website
       - MAX_FILE_SIZE=60457280
     deploy:
