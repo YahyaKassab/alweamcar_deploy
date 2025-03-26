@@ -64,15 +64,20 @@ services:
     restart: always
     ports:
       - '80:80'
+      - '443:443'
     depends_on:
       - backend
     networks:
       - alweam-network
+    volumes:
+      - /etc/ssl/private/fullchain.crt:/etc/nginx/certs/fullchain.crt
+      - /etc/ssl/private/alweamcar.key:/etc/nginx/certs/alweamcar.key
     logging:
       driver: 'json-file'
       options:
         max-size: '10m'
         max-file: '3'
+  restart: unless-stopped
 
 networks:
   alweam-network:
