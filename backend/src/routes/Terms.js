@@ -1,8 +1,9 @@
 const express = require('express');
-const { getTermsAndConditions , updateTermsAndConditions } = require('../controllers/terms');
+const { getTermsAndConditions, updateTermsAndConditions } = require('../controllers/terms');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
+
 /**
  * @swagger
  * /api/terms:
@@ -34,19 +35,21 @@ const router = express.Router();
  *                             properties:
  *                               en:
  *                                 type: string
- *                                 example: "Terms & Conditions"
+ *                                 example: "Introduction to Terms"
  *                               ar:
  *                                 type: string
- *                                 example: "الشروط والأحكام"
+ *                                 example: "مقدمة في الشروط"
  *                           details:
- *                             type: object
- *                             properties:
- *                               en:
- *                                 type: string
- *                                 example: "Our mission is to provide the best services..."
- *                               ar:
- *                                 type: string
- *                                 example: "مهمتنا هي تقديم أفضل الخدمات..."
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 en:
+ *                                   type: string
+ *                                   example: "These terms govern the use of our services."
+ *                                 ar:
+ *                                   type: string
+ *                                   example: "تحكم هذه الشروط استخدام خدماتنا."
  *                           order:
  *                             type: number
  *                             example: 1
@@ -57,6 +60,8 @@ const router = express.Router();
  *     summary: Update the "Terms & Conditions" content
  *     description: Updates the "Terms & Conditions" section content in both English and Arabic.
  *     tags: [Terms & Conditions]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -74,22 +79,24 @@ const router = express.Router();
  *                       properties:
  *                         en:
  *                           type: string
- *                           example: "Updated Terms & Conditions"
+ *                           example: "Updated Introduction to Terms"
  *                         ar:
  *                           type: string
- *                           example: "الشروط والأحكام المحدثة"
+ *                           example: "مقدمة محدثة في الشروط"
  *                     details:
- *                       type: object
- *                       properties:
- *                         en:
- *                           type: string
- *                           example: "Updated details about our terms..."
- *                         ar:
- *                           type: string
- *                           example: "تفاصيل محدثة حول الشروط..."
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           en:
+ *                             type: string
+ *                             example: "Updated terms govern our services."
+ *                           ar:
+ *                             type: string
+ *                             example: "الشروط المحدثة تحكم خدماتنا."
  *                     order:
  *                       type: number
- *                       example: 2
+ *                       example: 1
  *     responses:
  *       200:
  *         description: Successfully updated content
@@ -114,22 +121,24 @@ const router = express.Router();
  *                             properties:
  *                               en:
  *                                 type: string
- *                                 example: "Updated Terms & Conditions"
+ *                                 example: "Updated Introduction to Terms"
  *                               ar:
  *                                 type: string
- *                                 example: "الشروط والأحكام المحدثة"
+ *                                 example: "مقدمة محدثة في الشروط"
  *                           details:
- *                             type: object
- *                             properties:
- *                               en:
- *                                 type: string
- *                                 example: "Updated details about our terms..."
- *                               ar:
- *                                 type: string
- *                                 example: "تفاصيل محدثة حول الشروط..."
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 en:
+ *                                   type: string
+ *                                   example: "Updated terms govern our services."
+ *                                 ar:
+ *                                   type: string
+ *                                   example: "الشروط المحدثة تحكم خدماتنا."
  *                           order:
  *                             type: number
- *                             example: 2
+ *                             example: 1
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
