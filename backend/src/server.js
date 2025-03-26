@@ -69,15 +69,6 @@ app.use(helmet({ contentSecurityPolicy: false }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-if (process.env.NODE_ENV === 'production') {
-  app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(`https://${req.header('host')}${req.url}`);
-    } else {
-      next();
-    }
-  });
-}
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '../public')));
