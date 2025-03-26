@@ -105,9 +105,8 @@ TermsAndConditionsSchema.statics.getInstance = async function () {
       ],
       updatedAt: Date.now(),
     });
-
-    return instance;
   }
+  return instance;
 };
 
 module.exports = mongoose.model('TermsAndConditions', TermsAndConditionsSchema);
