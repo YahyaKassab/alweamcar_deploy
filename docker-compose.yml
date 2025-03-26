@@ -70,13 +70,14 @@ services:
     networks:
       - alweam-network
     volumes:
-      - /etc/ssl/private/fullchain.crt:/etc/nginx/certs/fullchain.crt
-      - /etc/ssl/private/alweamcar.key:/etc/nginx/certs/alweamcar.key
+      - ./ssl-certs/fullchain.pem:/etc/ssl/certs/fullchain.pem
+      - /etc/ssl/private/alweamcar.key:/etc/ssl/private/alweamcar.key
     logging:
       driver: 'json-file'
       options:
         max-size: '10m'
         max-file: '3'
+
 networks:
   alweam-network:
     driver: bridge
