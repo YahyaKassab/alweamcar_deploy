@@ -14,16 +14,18 @@ const TermsAndConditionsSchema = new mongoose.Schema({
           required: [true, messages.contentRequired.en],
         },
       },
-      details: {
-        en: {
-          type: String,
-          required: [true, messages.contentRequired.en],
+      details: [
+        {
+          en: {
+            type: String,
+            required: [true, messages.contentRequired.en],
+          },
+          ar: {
+            type: String,
+            required: [true, messages.contentRequired.en],
+          },
         },
-        ar: {
-          type: String,
-          required: [true, messages.contentRequired.en],
-        },
-      },
+      ],
       order: Number,
     },
   ],
@@ -50,10 +52,16 @@ TermsAndConditionsSchema.statics.getInstance = async function () {
             en: 'Introduction to Terms',
             ar: 'مقدمة في الشروط',
           },
-          details: {
-            en: 'These terms govern the use of our services.',
-            ar: 'تحكم هذه الشروط استخدام خدماتنا.',
-          },
+          details: [
+            {
+              en: 'These terms govern the use of our services.',
+              ar: 'تحكم هذه الشروط استخدام خدماتنا.',
+            },
+            {
+              en: 'Please read these terms carefully before using our services.',
+              ar: 'يرجى قراءة هذه الشروط بعناية قبل استخدام خدماتنا.',
+            },
+          ],
           order: 1,
         },
         {
@@ -61,10 +69,20 @@ TermsAndConditionsSchema.statics.getInstance = async function () {
             en: 'User Responsibilities',
             ar: 'مسؤوليات المستخدم',
           },
-          details: {
-            en: 'Users must comply with all rules and policies.',
-            ar: 'يجب على المستخدمين الامتثال لجميع القواعد والسياسات.',
-          },
+          details: [
+            {
+              en: 'Users must comply with all rules and policies.',
+              ar: 'يجب على المستخدمين الامتثال لجميع القواعد والسياسات.',
+            },
+            {
+              en: 'Users are responsible for maintaining the security of their accounts.',
+              ar: 'المستخدمون مسؤولون عن الحفاظ على أمان حساباتهم.',
+            },
+            {
+              en: 'Users must not share their login credentials with others.',
+              ar: 'يجب على المستخدمين عدم مشاركة بيانات تسجيل الدخول الخاصة بهم مع الآخرين.',
+            },
+          ],
           order: 2,
         },
         {
@@ -72,17 +90,24 @@ TermsAndConditionsSchema.statics.getInstance = async function () {
             en: 'Privacy Policy',
             ar: 'سياسة الخصوصية',
           },
-          details: {
-            en: 'We value your privacy and protect your data.',
-            ar: 'نحن نقدر خصوصيتك ونحمي بياناتك.',
-          },
+          details: [
+            {
+              en: 'We value your privacy and protect your data.',
+              ar: 'نحن نقدر خصوصيتك ونحمي بياناتك.',
+            },
+            {
+              en: 'We only collect necessary personal information.',
+              ar: 'نقوم بجمع المعلومات الشخصية الضرورية فقط.',
+            },
+          ],
           order: 3,
         },
       ],
       updatedAt: Date.now(),
     });
+
+    return instance;
   }
-  return instance;
 };
 
 module.exports = mongoose.model('TermsAndConditions', TermsAndConditionsSchema);

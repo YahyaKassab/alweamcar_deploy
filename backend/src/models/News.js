@@ -2,33 +2,16 @@ const mongoose = require('mongoose');
 const messages = require('../locales/messages');
 
 const NewsSchema = new mongoose.Schema({
-  content: [
-    {
-      title: {
-        en: {
-          type: String,
-          required: [true, messages.titleRequired.en],
-          trim: true,
-        },
-        ar: {
-          type: String,
-          required: [true, messages.titleRequired.ar],
-          trim: true,
-        },
-      },
-
-      details: {
-        en: {
-          type: String,
-          required: [true, messages.detailsRequired.en],
-        },
-        ar: {
-          type: String,
-          required: [true, messages.detailsRequired.ar],
-        },
-      },
+  details: {
+    en: {
+      type: String,
+      required: [true, messages.detailsRequired.en],
     },
-  ],
+    ar: {
+      type: String,
+      required: [true, messages.detailsRequired.ar],
+    },
+  },
   preview: {
     en: {
       type: String,
