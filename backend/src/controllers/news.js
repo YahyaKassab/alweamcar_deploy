@@ -26,11 +26,7 @@ exports.getAllNews = asyncHandler(async (req, res, next) => {
   const skip = (page - 1) * parsedLimit;
 
   const total = await News.countDocuments();
-  const news = await News.find()
-    .select('-details -__v')
-    .skip(skip)
-    .limit(parsedLimit)
-    .sort('-date');
+  const news = await News.find().select('-__v').skip(skip).limit(parsedLimit).sort('-date');
 
   res.status(200).json({
     success: true,
