@@ -1,6 +1,16 @@
 const mongoose = require('mongoose');
 
 const SocialSchema = new mongoose.Schema({
+  description: {
+    en: {
+      type: String,
+      default: null,
+    },
+    ar: {
+      type: String,
+      default: null,
+    },
+  },
   mobile: {
     type: String,
     default: null,
@@ -22,8 +32,14 @@ const SocialSchema = new mongoose.Schema({
     default: null,
   },
   location: {
-    type: String,
-    default: null,
+    en: {
+      type: String,
+      default: null,
+    },
+    ar: {
+      type: String,
+      default: null,
+    },
   },
   locationLink: {
     type: String,
@@ -53,13 +69,20 @@ SocialSchema.statics.getInstance = async function () {
   let instance = await this.findOne();
   if (!instance) {
     instance = await this.create({
+      description: {
+        en: 'description in english',
+        ar: 'وصف بالعربية',
+      },
       mobile: '065343353', // Assuming this is the showroom number as mobile
       insta: 'https://www.instagram.com/alweamcars?igsh=MXY1djk0ZmM0ZHZpYg%3D%3D&utm_source=qr',
       tiktok: 'https://www.tiktok.com/@alweamcars?is_from_webapp=1&sender_device=pc',
       youtube: 'ALWEAMCARS - YouTube', // You might want to replace with actual URL if available
       snapchat:
         'https://www.snapchat.com/add/alweamcars?sender_web_id=b2859193-8896-46a2-a177-3d146e0729e0&device_type=desktop&is_copy_url=true',
-      location: 'SHARJAH – RED PLOT- LAND313/A-ALWEAM CENTER-SHOWROOM NO 4',
+      location: {
+        en: 'SHARJAH – RED PLOT- LAND313/A-ALWEAM CENTER-SHOWROOM NO 4',
+        ar: 'شارقة – بلوك 313/أ- مركز الوئام - صالة رقم 4',
+      },
       locationLink: 'https://maps.app.goo.gl/G5FEZoaa9pFBVvNy8',
       email: null, // Not provided in your defaults
       whatsapp: null, // Not provided in your defaults

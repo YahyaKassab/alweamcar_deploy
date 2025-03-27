@@ -73,7 +73,6 @@ router.route('/').get(getSocial);
  *   put:
  *     summary: Update social media and contact information
  *     tags: [Social]
-
  *     requestBody:
  *       required: false
  *       content:
@@ -81,6 +80,15 @@ router.route('/').get(getSocial);
  *           schema:
  *             type: object
  *             properties:
+ *               description:
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: Description in English
+ *                   ar:
+ *                     type: string
+ *                     description: Description in Arabic
  *               mobile:
  *                 type: string
  *                 description: Mobile phone number
@@ -97,11 +105,17 @@ router.route('/').get(getSocial);
  *                 type: string
  *                 description: Snapchat URL or handle
  *               location:
- *                 type: string
- *                 description: Physical location or address
+ *                 type: object
+ *                 properties:
+ *                   en:
+ *                     type: string
+ *                     description: Location in English
+ *                   ar:
+ *                     type: string
+ *                     description: Location in Arabic
  *               locationLink:
  *                 type: string
- *                 description: Physical location or address
+ *                 description: Google Maps or other location link
  *               email:
  *                 type: string
  *                 description: Contact email address
@@ -130,6 +144,13 @@ router.route('/').get(getSocial);
  *                   properties:
  *                     _id:
  *                       type: string
+ *                     description:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                         ar:
+ *                           type: string
  *                     mobile:
  *                       type: string
  *                     insta:
@@ -141,6 +162,13 @@ router.route('/').get(getSocial);
  *                     snapchat:
  *                       type: string
  *                     location:
+ *                       type: object
+ *                       properties:
+ *                         en:
+ *                           type: string
+ *                         ar:
+ *                           type: string
+ *                     locationLink:
  *                       type: string
  *                     email:
  *                       type: string
@@ -158,6 +186,7 @@ router.route('/').get(getSocial);
  *       401:
  *         description: Unauthorized
  */
+
 router.route('/').put(protect, updateSocial);
 
 module.exports = router;
