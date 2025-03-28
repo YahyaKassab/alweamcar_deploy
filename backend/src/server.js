@@ -12,7 +12,7 @@ const { createRootAdmin } = require('./adminSeeder');
 // Rate limiter configuration
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 1000, // Limit each IP to 100 requests per windowMs
   message: {
     en: 'Too many requests from this IP, please try again after 15 minutes',
     ar: 'أرسلت الكثير من الطلبات، حاول مجددا بعد 15 دقيقة',
@@ -46,12 +46,13 @@ const app = express();
 // Enable CORS
 app.use(
   cors({
-    origin: '*', // Allow all origins (or specify your frontend domain)
-    methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
+    origin: 'http://localhost:3000', // Replace with your React app's URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true, // If you need cookies or auth headers
   })
 );
-// app.use(limiter);
+app.use(limiter);
 
 // Create root admin upon startup
 (async () => {
