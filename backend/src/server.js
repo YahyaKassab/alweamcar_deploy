@@ -43,7 +43,15 @@ const faqRoutes = require('./routes/FAQ');
 const partnerRoutes = require('./routes/partners');
 
 const app = express();
-app.use(limiter);
+// Enable CORS
+app.use(
+  cors({
+    origin: '*', // Allow all origins (or specify your frontend domain)
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+  })
+);
+// app.use(limiter);
 
 // Create root admin upon startup
 (async () => {
@@ -58,9 +66,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Enable CORS
-app.use(cors());
 
 // Set security headers
 app.use(helmet({ contentSecurityPolicy: false }));
