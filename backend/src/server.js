@@ -45,7 +45,7 @@ const partnerRoutes = require('./routes/partners');
 const app = express();
 // Enable CORS
 app.use(cors());
-app.use(limiter);
+// app.use(limiter);
 
 // Create root admin upon startup
 (async () => {
