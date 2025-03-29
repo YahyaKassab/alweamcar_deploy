@@ -103,27 +103,14 @@ const CarSchema = new mongoose.Schema(
       type: Number,
       required: [true, messages.priceRequired?.en || 'Price is required'],
     },
-    images: {
-      type: [
-        {
-          url: {
-            type: String,
-            required: [true, 'Image URL is required'],
-          },
-          main: {
-            type: Boolean,
-            default: false,
-          },
-        },
-      ],
-      validate: {
-        validator: function (images) {
-          // Ensure exactly one image is marked as main
-          const mainCount = images.filter((img) => img.main).length;
-          return mainCount === 1;
-        },
-        message: 'Exactly one image must be marked as main',
-      },
+    financeAvailable: {
+      type: Boolean,
+      default: false,
+    },
+    images: [String],
+    mainImage: {
+      type: String,
+      required: [true, 'Main Image URL is required'],
     },
   },
   {

@@ -9,9 +9,10 @@
       "ar": "كامري"
     },
     "year": 2022,
+    "financeAvailable": false,
     "condition": "Brand New",
     "mileage": 0,
-    "stockNumber": "TOY123456",
+    "stockNumber": "TOY153456",
     "exteriorColor": {
       "en": "White",
       "ar": "أبيض"
@@ -43,6 +44,92 @@
   },
   {
     "make": {
+      "en": "Toyota",
+      "ar": "تويوتا"
+    },
+    "model": {
+      "en": "Highlander",
+      "ar": "هايلاندر"
+    },
+    "year": 2022,
+    "financeAvailable": false,
+    "condition": "Brand New",
+    "mileage": 0,
+    "stockNumber": "TOY163456",
+    "exteriorColor": {
+      "en": "White",
+      "ar": "أبيض"
+    },
+    "interiorColor": {
+      "en": "Beige",
+      "ar": "بيج"
+    },
+    "engine": {
+      "en": "2.5L 4-Cylinder",
+      "ar": "2.5 لتر 4 أسطوانات"
+    },
+    "bhp": {
+      "en": "203",
+      "ar": "203"
+    },
+    "door": 4,
+    "warranty": true,
+    "name": {
+      "en": "Toyota Highlander 2022",
+      "ar": "تويوتا هايلاندر 2022"
+    },
+    "price": 28000,
+    "images": [
+      { "url": "1.jpg", "main": true },
+      { "url": "2.jpg", "main": false },
+      { "url": "3.jpg", "main": false }
+    ]
+  },
+  {
+    "make": {
+      "en": "Toyota",
+      "ar": "تويوتا"
+    },
+    "model": {
+      "en": "Corolla",
+      "ar": "كورولا"
+    },
+    "year": 2022,
+    "financeAvailable": false,
+    "condition": "Brand New",
+    "mileage": 0,
+    "stockNumber": "TOY123756",
+    "exteriorColor": {
+      "en": "White",
+      "ar": "أبيض"
+    },
+    "interiorColor": {
+      "en": "Beige",
+      "ar": "بيج"
+    },
+    "engine": {
+      "en": "2.5L 4-Cylinder",
+      "ar": "2.5 لتر 4 أسطوانات"
+    },
+    "bhp": {
+      "en": "203",
+      "ar": "203"
+    },
+    "door": 4,
+    "warranty": true,
+    "name": {
+      "en": "Toyota Corolla 2022",
+      "ar": "تويوتا كورولا 2022"
+    },
+    "price": 28000,
+    "images": [
+      { "url": "1.jpg", "main": true },
+      { "url": "2.jpg", "main": false },
+      { "url": "3.jpg", "main": false }
+    ]
+  },
+  {
+    "make": {
       "en": "Honda",
       "ar": "هوندا"
     },
@@ -51,6 +138,7 @@
       "ar": "سيفيك"
     },
     "year": 2021,
+    "financeAvailable": true,
     "condition": "Elite Approved",
     "mileage": 12000,
     "stockNumber": "HON456789",

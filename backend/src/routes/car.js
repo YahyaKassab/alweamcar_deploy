@@ -113,14 +113,11 @@ const router = express.Router();
  *         images:
  *           type: array
  *           items:
- *             type: object
- *             properties:
- *               url:
- *                 type: string
- *                 description: URL of the image
- *               main:
- *                 type: boolean
- *                 description: Whether this is the main image
+ *             type: string
+ *           description: Array of image URLs
+ *         mainImage:
+ *           type: string
+ *           description: URL of the main image (must be one of the images in the images array)
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -258,7 +255,6 @@ router.get('/:id/similar', getSimilarCars);
  *               - name[en]
  *               - name[ar]
  *               - price
- *               - images
  *             properties:
  *               make:
  *                 type: string
@@ -326,7 +322,10 @@ router.get('/:id/similar', getSimilarCars);
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: Array of image files (must include exactly one main image)
+ *                 description: Array of image files (first image will be set as mainImage by default)
+ *               mainImage:
+ *                 type: string
+ *                 description: URL of an existing image to set as main image (optional)
  *     responses:
  *       201:
  *         description: Car created successfully
@@ -461,7 +460,10 @@ router.route('/').get(getCars).post(protect, uploadCar, createCar);
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: Array of image files (must include exactly one main image if replacing)
+ *                 description: Array of image files to add or replace
+ *               mainImage:
+ *                 type: string
+ *                 description: URL to set as the main image (must be one of the existing or newly uploaded images)
  *               replaceImages:
  *                 type: string
  *                 enum: ['true', 'false']

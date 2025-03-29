@@ -1,4 +1,4 @@
-const fs = require('fs').promises; // Use promises for async file operations
+const fs = require('fs'); // Use promises for async file operations
 const path = require('path');
 const SeasonalOffer = require('../models/SeasonalOffer');
 const ErrorResponse = require('../utils/errorResponse');
@@ -110,7 +110,7 @@ exports.updateSeasonalOffer = asyncHandler(async (req, res, next) => {
       try {
         const oldFilePath = path.join(__dirname, '..', '..', '..', offer.image);
         if (fs.existsSync(oldFilePath)) {
-          await fs.unlink(oldFilePath);
+          await fs.promises.unlink(oldFilePath);
           console.log(`Deleted old image: ${offer.image}`);
         }
       } catch (error) {
@@ -151,7 +151,7 @@ exports.deleteSeasonalOffer = asyncHandler(async (req, res, next) => {
     try {
       const filePath = path.join(__dirname, '..', '..', '..', offer.image);
       if (fs.existsSync(filePath)) {
-        await fs.unlink(filePath);
+        await fs.promises.unlink(filePath);
         console.log(`Deleted image: ${offer.image}`);
       }
     } catch (error) {

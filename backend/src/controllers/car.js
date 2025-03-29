@@ -106,18 +106,22 @@ exports.createCar = asyncHandler(async (req, res, next) => {
   // Handle image uploads if files are present
   if (req.files && req.files.length > 0) {
     try {
-      carData.images = req.files.map((file, index) => ({
-        url: file.url, // Use the processed URL from middleware
-        main: index === 0,
-      }));
+      // Set images array with all image URLs
+      carData.images = req.files.map((file) => file.url);
+
+      // Set mainImage to the first uploaded image
+      carData.mainImage = req.files[0].url;
     } catch (error) {
       return next(new ErrorResponse(error.message, 400));
     }
   } else if (carData.images && carData.images.length > 0) {
-    carData.images = carData.images.map((img, index) => ({
-      url: img.url || img,
-      main: index === 0,
-    }));
+    // If images are provided as strings in the request body
+    carData.images = carData.images.map((img) => (typeof img === 'object' ? img.url : img));
+
+    // Set mainImage from provided images if not already set
+    if (!carData.mainImage && carData.images.length > 0) {
+      carData.mainImage = carData.images[0];
+    }
   }
 
   const car = await Car.create(carData);
@@ -160,36 +164,55 @@ exports.updateCar = asyncHandler(async (req, res, next) => {
   // Handle image updates if files are uploaded
   if (req.files && req.files.length > 0) {
     try {
-      const newImagePaths = req.files.map((file, index) => ({
-        url: file.url, // Use the processed URL from middleware
-        main: index === 0,
-      }));
+      const newImageUrls = req.files.map((file) => file.url);
 
       if (req.body.replaceImages === 'true') {
-        for (const image of car.images) {
+        // Delete old images from storage
+        for (const imageUrl of car.images) {
           try {
-            const filePath = path.join(__dirname, '..', '..', '..', image.url);
+            const filePath = path.join(__dirname, '..', '..', '..', imageUrl);
             if (fs.existsSync(filePath)) await fs.promises.unlink(filePath);
           } catch (error) {
             console.error('Failed to delete image from local storage:', error);
           }
         }
-        carData.images = newImagePaths;
+        // Replace all images
+        carData.images = newImageUrls;
+
+        // Update mainImage to first of new images
+        carData.mainImage = newImageUrls[0];
       } else {
-        const combinedImages = [...car.images, ...newImagePaths];
-        carData.images = combinedImages.map((img, index) => ({
-          url: img.url,
-          main: index === 0,
-        }));
+        // Append new images to existing ones
+        carData.images = [...car.images, ...newImageUrls];
+
+        // If mainImage wasn't previously set, set it now
+        if (!car.mainImage) {
+          carData.mainImage = car.images[0] || newImageUrls[0];
+        }
       }
     } catch (error) {
       return next(new ErrorResponse(error.message, 400));
     }
   } else if (carData.images && Array.isArray(carData.images)) {
-    carData.images = carData.images.map((img, index) => ({
-      url: img.url || img,
-      main: index === 0,
-    }));
+    // If images are provided as strings in the request body
+    carData.images = carData.images.map((img) => (typeof img === 'object' ? img.url : img));
+
+    // Update mainImage if explicitly provided
+    if (!carData.mainImage && carData.images.length > 0) {
+      // If mainImage not provided but images changed, default to first image
+      carData.mainImage = carData.images[0];
+    }
+  }
+
+  // If mainImage is explicitly set in the request, use it
+  if (req.body.mainImage) {
+    // Verify the mainImage exists in the images array
+    if (carData.images && !carData.images.includes(req.body.mainImage)) {
+      // If the specified mainImage isn't in the images array, add it
+      if (!carData.images) carData.images = [];
+      carData.images.push(req.body.mainImage);
+    }
+    carData.mainImage = req.body.mainImage;
   }
 
   car = await Car.findByIdAndUpdate(req.params.id, carData, {
@@ -205,12 +228,15 @@ exports.deleteCar = asyncHandler(async (req, res, next) => {
   const car = await Car.findById(req.params.id);
   if (!car) return next(new ErrorResponse(messages.notFound, 404));
 
-  for (const image of car.images) {
-    try {
-      const filePath = path.join(__dirname, '..', '..', '..', image.url);
-      if (fs.existsSync(filePath)) await fs.promises.unlink(filePath);
-    } catch (error) {
-      console.error('Failed to delete image from local storage:', error);
+  // Delete all images from storage
+  if (car.images && car.images.length > 0) {
+    for (const imageUrl of car.images) {
+      try {
+        const filePath = path.join(__dirname, '..', '..', '..', imageUrl);
+        if (fs.existsSync(filePath)) await fs.promises.unlink(filePath);
+      } catch (error) {
+        console.error('Failed to delete image from local storage:', error);
+      }
     }
   }
 
